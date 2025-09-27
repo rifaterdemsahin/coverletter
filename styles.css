@@ -232,6 +232,63 @@ body {
     min-height: 120px;
 }
 
+.sample-section {
+    margin-bottom: 30px;
+}
+
+.sample-card {
+    background: white;
+    border-radius: 16px;
+    padding: 30px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    backdrop-filter: blur(10px);
+}
+
+.sample-card h2 {
+    font-size: 1.5rem;
+    font-weight: 600;
+    margin-bottom: 10px;
+    color: #2d3748;
+}
+
+.sample-description {
+    color: #718096;
+    margin-bottom: 20px;
+    font-size: 1rem;
+}
+
+.sample-content {
+    background: #f7fafc;
+    border-radius: 12px;
+    border: 1px solid #e2e8f0;
+    overflow: hidden;
+}
+
+.sample-letter {
+    padding: 30px;
+    font-family: 'Georgia', serif;
+    line-height: 1.8;
+    white-space: pre-wrap;
+    color: #2d3748;
+    background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+    border-left: 4px solid #667eea;
+    position: relative;
+}
+
+.sample-letter::before {
+    content: "📄 Sample Output";
+    position: absolute;
+    top: 10px;
+    right: 20px;
+    background: #667eea;
+    color: white;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 500;
+    font-family: 'Inter', sans-serif;
+}
+
 .generate-section {
     text-align: center;
 }
@@ -468,8 +525,21 @@ body {
     }
     
     .upload-card,
-    .job-specs-card {
+    .job-specs-card,
+    .sample-card {
         padding: 20px;
+    }
+    
+    .sample-letter {
+        padding: 20px;
+        font-size: 0.9rem;
+    }
+    
+    .sample-letter::before {
+        position: static;
+        display: block;
+        margin-bottom: 15px;
+        text-align: center;
     }
     
     .result-header {
