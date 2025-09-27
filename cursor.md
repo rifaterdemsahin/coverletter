@@ -38,7 +38,7 @@ A modern, AI-powered web application that generates personalized cover letters u
 ### Prerequisites
 
 - Modern web browser with JavaScript enabled
-- Google Gemini API key
+- N8N backend endpoint configured (for production use)
 - Local web server (Python, Node.js, or any static server)
 
 ### Installation
@@ -49,19 +49,12 @@ A modern, AI-powered web application that generates personalized cover letters u
    cd ai-cover-letter-generator
    ```
 
-2. **Get a Gemini API Key**
-   - Visit [Google AI Studio](https://makersuite.google.com/app/apikey)
-   - Create a new API key
-   - Copy the API key for configuration
+2. **Configure N8N Endpoint (Optional for local development)**
+   - The app uses `https://n8n.rifaterdemsahin.com/webhook/cover-letter-generator` by default
+   - For local development, you can modify the endpoint in `script.js` if needed
+   - The N8N workflow handles the Gemini API integration securely
 
-3. **Configure the API Key**
-   - Open `script.js`
-   - Replace `YOUR_GEMINI_API_KEY_HERE` with your actual API key:
-   ```javascript
-   const API_KEY = 'your-actual-api-key-here';
-   ```
-
-4. **Start a Local Server**
+3. **Start a Local Server**
    
    **Option 1: Using Python (Recommended)**
    ```bash
@@ -78,7 +71,7 @@ A modern, AI-powered web application that generates personalized cover letters u
    - Serve the files from any static file server
    - Ensure CORS is properly configured for API calls
 
-5. **Open in Browser**
+4. **Open in Browser**
    - Navigate to `http://localhost:8000`
    - The application should load with the modern UI
 
@@ -108,28 +101,38 @@ A modern, AI-powered web application that generates personalized cover letters u
 
 ## API Integration
 
-The application integrates with Google's Gemini 2.5 Flash API:
+The application integrates with a secure N8N backend that handles Google's Gemini 2.5 Flash API:
 
-- **Model**: `gemini-2.0-flash-exp`
+- **Backend Endpoint**: `https://n8n.rifaterdemsahin.com/webhook/cover-letter-generator`
+- **Model**: `gemini-2.0-flash-exp` (handled by N8N workflow)
 - **Temperature**: 0.7 (balanced creativity and consistency)
 - **Max Tokens**: 2048 (sufficient for cover letter length)
 - **Prompt Engineering**: Custom prompts that analyze CV and job requirements
+- **Security**: API keys stored securely on the backend
 
 ### API Request Structure
 
 ```javascript
 {
-  "contents": [{
-    "parts": [{
-      "text": "Generated prompt with CV and job specs"
-    }]
-  }],
-  "generationConfig": {
-    "temperature": 0.7,
-    "topK": 40,
-    "topP": 0.95,
-    "maxOutputTokens": 2048
-  }
+  "cvContent": "Extracted CV text",
+  "jobSpecs": {
+    "companyName": "Company Name",
+    "jobTitle": "Job Title",
+    "jobDescription": "Job Description",
+    "applicantName": "Applicant Name",
+    "applicantEmail": "applicant@email.com"
+  },
+  "prompt": "Generated prompt with CV and job specs"
+}
+```
+
+### API Response Structure
+
+```javascript
+{
+  "success": true,
+  "coverLetter": "Generated cover letter content",
+  "error": null
 }
 ```
 
@@ -143,6 +146,7 @@ The application integrates with Google's Gemini 2.5 Flash API:
 ### AI Prompts
 - Edit the `createPrompt()` method in `script.js` to modify how cover letters are generated
 - Adjust the prompt to match your preferred writing style or requirements
+- Update N8N workflow for backend prompt modifications
 
 ### File Processing
 - Currently uses simulated PDF text extraction
@@ -153,10 +157,11 @@ The application integrates with Google's Gemini 2.5 Flash API:
 
 ## Security Considerations
 
-- **API Key**: Never commit API keys to version control
-- **CORS**: Ensure proper CORS configuration for API calls
+- **API Key**: API keys stored securely on N8N backend, not exposed to frontend
+- **CORS**: Ensure proper CORS configuration for N8N endpoint calls
 - **File Validation**: Always validate uploaded files on both client and server
 - **Rate Limiting**: Consider implementing rate limiting for production use
+- **Backend Security**: N8N workflow handles secure API key management
 
 ## Browser Compatibility
 
@@ -175,13 +180,13 @@ The application integrates with Google's Gemini 2.5 Flash API:
 
 ### Common Issues
 
-1. **API Key Error**
-   - Ensure your Gemini API key is valid and has proper permissions
-   - Check that the API key is correctly set in `script.js`
+1. **N8N Endpoint Error**
+   - Ensure the N8N endpoint is accessible and properly configured
+   - Check that the endpoint URL is correct in `script.js`
 
 2. **CORS Errors**
    - Make sure you're running the app from a local server, not opening the HTML file directly
-   - The Gemini API requires proper CORS headers
+   - The N8N endpoint requires proper CORS headers
 
 3. **PDF Upload Issues**
    - Ensure the file is a valid PDF
@@ -191,7 +196,7 @@ The application integrates with Google's Gemini 2.5 Flash API:
 4. **Generation Fails**
    - Check browser console for error messages
    - Verify internet connection
-   - Ensure API quota hasn't been exceeded
+   - Ensure N8N endpoint is accessible and responding
 
 ### Debug Mode
 
@@ -210,6 +215,8 @@ localStorage.setItem('debug', 'true');
 - [ ] Multi-language support
 - [ ] Advanced customization options
 - [ ] User accounts and cloud storage
+- [ ] Enhanced N8N workflows with additional AI models
+- [ ] Backend analytics and usage tracking
 
 ## Contributing
 
@@ -232,4 +239,4 @@ For issues and questions:
 
 ---
 
-**Note**: This application requires a valid Google Gemini API key to function. The current implementation includes simulated PDF processing for demonstration purposes. In a production environment, implement proper PDF text extraction.
+**Note**: This application requires a properly configured N8N backend endpoint to function. The current implementation includes simulated PDF processing for demonstration purposes. In a production environment, implement proper PDF text extraction and ensure the N8N workflow is properly configured with the Gemini API key.

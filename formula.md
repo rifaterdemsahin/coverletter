@@ -7,7 +7,7 @@ The AI Cover Letter Generator is a web application that leverages Google's Gemin
 ## Core Logic Formula
 
 ```
-Cover Letter = AI_Model(CV_Content + Job_Specs + Prompt_Engineering)
+Cover Letter = N8N_Workflow(AI_Model(CV_Content + Job_Specs + Prompt_Engineering))
 ```
 
 Where:
@@ -15,6 +15,7 @@ Where:
 - **Job_Specs**: Company details, job description, and personal information
 - **Prompt_Engineering**: Structured instructions for the AI model
 - **AI_Model**: Gemini 2.5 Flash for content generation
+- **N8N_Workflow**: Secure backend processing and API management
 
 ## Design Philosophy
 
@@ -23,12 +24,17 @@ Where:
 - **Solution**: Automated generation that maintains personalization and relevance
 - **Principle**: Reduce friction while maintaining quality
 
-### 2. **AI-First Architecture**
+### 2. **AI-First Architecture with Secure Backend**
 - **Model Selection**: Gemini 2.5 Flash chosen for:
   - Advanced reasoning capabilities
   - Cost-effectiveness for text generation
   - High-quality output with creative flexibility
   - Fast response times
+- **Backend Architecture**: N8N workflow for:
+  - Secure API key management
+  - Scalable processing
+  - Error handling and retry logic
+  - Future extensibility
 
 ### 3. **Progressive Enhancement**
 - **Base**: Core functionality works without JavaScript
@@ -63,7 +69,7 @@ HTML (Structure) → CSS (Presentation) → JavaScript (Behavior)
 ### Data Flow Logic
 
 ```
-User Input → Validation → Processing → AI Generation → Output
+User Input → Validation → Processing → N8N Backend → AI Generation → Output
 ```
 
 1. **Input Collection**
@@ -76,12 +82,18 @@ User Input → Validation → Processing → AI Generation → Output
    - Data sanitization and formatting
    - Prompt construction
 
-3. **AI Integration**
-   - API key management
+3. **N8N Backend Integration**
+   - Secure API endpoint communication
    - Request/response handling
    - Error handling and retry logic
+   - API key management (backend)
 
-4. **Output Generation**
+4. **AI Generation**
+   - Gemini 2.5 Flash model processing
+   - Content generation and formatting
+   - Quality assurance
+
+5. **Output Generation**
    - Content formatting
    - Copy/download functionality
    - User feedback systems
@@ -140,7 +152,8 @@ Context + Instructions + Examples + Constraints
 - **Client-side Validation**: Immediate feedback
 - **File Type Restrictions**: PDF only for security
 - **Size Limitations**: 10MB limit to prevent abuse
-- **API Key Protection**: Never expose in client code
+- **API Key Protection**: Stored securely on N8N backend
+- **Backend Security**: N8N workflow handles secure processing
 
 ### Performance Optimization
 - **Lazy Loading**: Components load as needed
@@ -167,12 +180,15 @@ Context + Instructions + Examples + Constraints
 - **PDF Processing**: Simulated text extraction
 - **Single User**: No user management system
 - **Local Storage**: No persistence between sessions
+- **Backend Dependency**: Requires N8N endpoint for full functionality
 
 ### Future Enhancements
 - **Real PDF Parsing**: Implement actual PDF text extraction
 - **User Accounts**: Multi-user support with cloud storage
 - **Template System**: Multiple cover letter templates
 - **Analytics**: Usage tracking and optimization
+- **Enhanced N8N Workflows**: Additional AI models and processing options
+- **Backend Scaling**: Load balancing and performance optimization
 
 ## Quality Assurance Logic
 
@@ -198,17 +214,18 @@ Context + Instructions + Examples + Constraints
 
 ### Cost-Benefit Analysis
 - **Development Cost**: One-time development investment
-- **Operational Cost**: API usage costs per generation
+- **Operational Cost**: N8N hosting and API usage costs per generation
 - **User Value**: Time savings and improved application success
 - **ROI**: Measured in user satisfaction and time saved
+- **Backend Efficiency**: N8N workflow optimization reduces processing costs
 
 ## Implementation Formula
 
 ### Development Phases
-1. **MVP**: Core functionality with basic UI
+1. **MVP**: Core functionality with basic UI and N8N backend
 2. **Enhancement**: Advanced features and polish
 3. **Optimization**: Performance and user experience improvements
-4. **Scale**: Multi-user and enterprise features
+4. **Scale**: Multi-user and enterprise features with enhanced N8N workflows
 
 ### Success Metrics
 - **User Engagement**: Time spent on platform
@@ -225,6 +242,6 @@ The AI Cover Letter Generator follows a systematic approach that combines modern
 3. **Scale Efficiently**: Handle multiple users and requests with minimal infrastructure
 4. **Adapt Continuously**: Improve based on user feedback and AI model updates
 
-The formula for success is: **User-Centric Design + AI-Powered Content + Modern Web Technologies = Professional Cover Letter Generation**
+The formula for success is: **User-Centric Design + AI-Powered Content + Secure N8N Backend + Modern Web Technologies = Professional Cover Letter Generation**
 
 This approach ensures that the application not only meets current needs but can evolve with changing requirements and technological advancements.

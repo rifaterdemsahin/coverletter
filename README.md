@@ -43,19 +43,11 @@ A modern, AI-powered web application that generates personalized cover letters u
    cd coverletter
    ```
 
-2. **Get a Gemini API Key**
-   - Visit [Google AI Studio](https://makersuite.google.com/app/apikey)
-   - Create a new API key
-   - Copy the API key for configuration
+2. **Configure N8N Endpoint (Optional for local development)**
+   - The app uses `https://n8n.rifaterdemsahin.com/webhook/cover-letter-generator` by default
+   - For local development, you can modify the endpoint in `script.js` if needed
 
-3. **Configure the API Key**
-   - Open `script.js`
-   - Replace `YOUR_GEMINI_API_KEY_HERE` with your actual API key:
-   ```javascript
-   const API_KEY = 'your-actual-api-key-here';
-   ```
-
-4. **Start a Local Server**
+3. **Start a Local Server**
    
    **Option 1: Using Python (Recommended)**
    ```bash
@@ -68,7 +60,7 @@ A modern, AI-powered web application that generates personalized cover letters u
    npm run serve
    ```
 
-5. **Open in Browser**
+4. **Open in Browser**
    - Navigate to `http://localhost:8000`
    - Start generating cover letters!
 
@@ -97,21 +89,24 @@ A modern, AI-powered web application that generates personalized cover letters u
 
 ## 🤖 AI Integration
 
-The application uses Google's Gemini 2.5 Flash model for cover letter generation:
+The application uses Google's Gemini 2.5 Flash model via a secure N8N backend:
 
+- **Backend**: N8N workflow at `https://n8n.rifaterdemsahin.com/webhook/cover-letter-generator`
 - **Model**: `gemini-2.0-flash-exp`
 - **Temperature**: 0.7 (balanced creativity and consistency)
 - **Max Tokens**: 2048 (sufficient for cover letter length)
 - **Prompt Engineering**: Advanced prompts that analyze CV and job requirements
 - **Quality Control**: Reference examples ensure consistent, professional output
+- **Security**: API keys stored securely on the backend, not exposed to the frontend
 
 ## 📊 How It Works
 
 1. **Input Processing**: Upload PDF CV and fill job specifications
 2. **Content Extraction**: Extract text from uploaded CV (simulated in demo)
-3. **AI Analysis**: Gemini 2.5 analyzes CV content and job requirements
-4. **Generation**: AI creates personalized cover letter based on analysis
-5. **Output**: Professional cover letter ready for use
+3. **API Call**: Frontend sends data to N8N backend endpoint
+4. **AI Analysis**: N8N workflow calls Gemini 2.5 to analyze CV content and job requirements
+5. **Generation**: AI creates personalized cover letter based on analysis
+6. **Output**: Professional cover letter ready for use
 
 ## 🔧 Technical Details
 
@@ -119,7 +114,7 @@ The application uses Google's Gemini 2.5 Flash model for cover letter generation
 - **HTML5**: Semantic markup for accessibility
 - **CSS3**: Modern styling with Flexbox/Grid
 - **JavaScript ES6+**: Class-based architecture with async/await
-- **APIs**: Google Gemini 2.5 Flash API integration
+- **APIs**: N8N backend integration for secure AI processing
 
 ### Key Features
 - **File Upload**: Drag-and-drop with validation
@@ -137,7 +132,7 @@ The application uses Google's Gemini 2.5 Flash model for cover letter generation
 ## 🔒 Security & Privacy
 
 - **Client-Side Processing**: Files processed locally before API calls
-- **API Security**: Secure API key management
+- **API Security**: API keys stored securely on N8N backend
 - **Data Privacy**: No data stored or logged
 - **File Validation**: Strict file type and size restrictions
 
@@ -160,6 +155,7 @@ The application is deployed on GitHub Pages for easy access:
 - Edit the `createPrompt()` method in `script.js`
 - Adjust prompts for different writing styles or requirements
 - Include reference examples for consistent quality
+- Update N8N workflow for backend prompt modifications
 
 ### Features
 - Add new form fields for additional job details
@@ -204,6 +200,7 @@ Contributions are welcome! Here's how you can help:
 
 ### Areas for Contribution
 - PDF text extraction implementation
+- N8N workflow enhancements
 - Additional AI model integrations
 - UI/UX improvements
 - Performance optimizations
@@ -222,6 +219,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 ## 🙏 Acknowledgments
 
 - **Google Gemini**: For providing the powerful AI model
+- **N8N**: For providing the workflow automation platform
 - **Open Source Community**: For inspiration and best practices
 - **Modern Web Standards**: For enabling seamless browser integration
 
@@ -231,7 +229,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 - ✅ **Live Demo**: Deployed and accessible
 - ✅ **Documentation**: Comprehensive docs included
 - 🔄 **Continuous Improvement**: Regular updates and enhancements
-- 🚀 **Future Features**: Real PDF parsing, user accounts, templates
+- 🚀 **Future Features**: Real PDF parsing, user accounts, templates, enhanced N8N workflows
 
 ---
 
