@@ -122,36 +122,88 @@ class CoverLetterGenerator {
     }
 
     async generateCoverLetter() {
+        console.log('🚀 Starting cover letter generation...');
+        
         if (!this.cvFile) {
+            console.error('❌ No CV file uploaded');
             this.showError('Please upload your CV first.');
             return;
         }
 
+        console.log('✅ CV file found:', this.cvFile.name, `(${this.formatFileSize(this.cvFile.size)})`);
         this.setLoadingState(true);
         this.hideMessages();
 
         try {
-            // Read PDF content
+            // Step 1: Read PDF content
+            console.log('📄 Step 1: Extracting PDF content...');
             const pdfContent = await this.extractPDFText(this.cvFile);
+            console.log('✅ PDF content extracted successfully, length:', pdfContent.length, 'characters');
+            console.log('📝 PDF content preview:', pdfContent.substring(0, 200) + '...');
             
-            // Get form data
+            // Step 2: Get form data
+            console.log('📋 Step 2: Collecting form data...');
             const formData = new FormData(this.jobSpecsForm);
             const jobSpecs = Object.fromEntries(formData.entries());
-
-            // Generate cover letter using N8N endpoint
-            const coverLetter = await this.callN8nAPI(pdfContent, jobSpecs);
+            console.log('✅ Form data collected:', jobSpecs);
             
+            // Validate form data
+            const requiredFields = ['companyName', 'jobTitle', 'jobDescription', 'applicantName', 'applicantEmail'];
+            const missingFields = requiredFields.filter(field => !jobSpecs[field] || jobSpecs[field].trim() === '');
+            if (missingFields.length > 0) {
+                throw new Error(`Missing required form fields: ${missingFields.join(', ')}`);
+            }
+            console.log('✅ All required form fields validated');
+
+            // Step 3: Create prompt
+            console.log('🎯 Step 3: Creating AI prompt...');
+            const prompt = this.createPrompt(pdfContent, jobSpecs);
+            console.log('✅ Prompt created successfully, length:', prompt.length, 'characters');
+            console.log('📝 Prompt preview:', prompt.substring(0, 300) + '...');
+
+            // Step 4: Generate cover letter using N8N endpoint
+            console.log('🌐 Step 4: Calling N8N API...');
+            const coverLetter = await this.callN8nAPI(pdfContent, jobSpecs);
+            console.log('✅ Cover letter generated successfully, length:', coverLetter.length, 'characters');
+            
+            // Step 5: Display result
+            console.log('📄 Step 5: Displaying result...');
             this.displayResult(coverLetter);
             this.showSuccess();
+            console.log('🎉 Cover letter generation completed successfully!');
+            
         } catch (error) {
-            console.error('Error generating cover letter:', error);
-            if (error.message.includes('N8N request failed')) {
-                this.showError('Service temporarily unavailable. Please try again later.');
+            console.error('❌ Error in generateCoverLetter:', error);
+            console.error('Error stack:', error.stack);
+            
+            let errorMessage = 'Failed to generate cover letter. ';
+            let detailedError = '';
+            
+            if (error.message.includes('Missing required form fields')) {
+                detailedError = `Form validation failed: ${error.message}`;
+                errorMessage += detailedError;
+            } else if (error.message.includes('PDF extraction failed')) {
+                detailedError = `PDF processing error: ${error.message}`;
+                errorMessage += detailedError;
+            } else if (error.message.includes('N8N request failed')) {
+                detailedError = `API connection failed: ${error.message}`;
+                errorMessage += detailedError;
+            } else if (error.message.includes('Network error')) {
+                detailedError = `Network connectivity issue: ${error.message}`;
+                errorMessage += detailedError;
+            } else if (error.message.includes('Invalid response')) {
+                detailedError = `API response error: ${error.message}`;
+                errorMessage += detailedError;
             } else {
-                this.showError('Failed to generate cover letter. Please try again.');
+                detailedError = `Unexpected error: ${error.message}`;
+                errorMessage += detailedError;
             }
+            
+            console.error('📋 Detailed error:', detailedError);
+            this.showError(errorMessage);
         } finally {
             this.setLoadingState(false);
+            console.log('🔄 Loading state reset');
         }
     }
 
