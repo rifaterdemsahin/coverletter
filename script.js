@@ -235,16 +235,41 @@ JOB APPLICATION DETAILS:
 - Applicant Name: ${jobSpecs.applicantName}
 - Applicant Email: ${jobSpecs.applicantEmail}
 
-INSTRUCTIONS:
-1. Write a professional cover letter that highlights relevant experience from the CV
-2. Match the candidate's skills to the job requirements mentioned in the job description
-3. Keep it concise but impactful (3-4 paragraphs)
-4. Use a professional but engaging tone
-5. Include specific examples of relevant experience
-6. End with a strong call to action
-7. Format it properly with appropriate greetings and closings
+REFERENCE COVER LETTER EXAMPLE:
+Dear Hiring Manager,
 
-Generate a cover letter that would help this candidate stand out for this specific position.
+I am writing to express my strong interest in the DevOps Engineer position at your company. With over five years of experience in cloud architecture, automation, and infrastructure management, I am excited about the opportunity to contribute to your team's success.
+
+In my current role as a Senior DevOps Engineer, I have successfully implemented CI/CD pipelines that reduced deployment time by 60% and improved system reliability by 95%. My expertise spans across Azure WebApps, Kubernetes orchestration, and infrastructure-as-code using Terraform. I have led cross-functional teams to migrate legacy applications to cloud-native architectures, resulting in 40% cost reduction and enhanced scalability.
+
+What particularly excites me about this opportunity is your company's commitment to innovation and cutting-edge technology. I am passionate about implementing robust monitoring solutions and automating complex deployment processes. My experience with containerization, microservices architecture, and cloud security best practices aligns perfectly with your requirements.
+
+I am eager to discuss how my technical expertise and collaborative approach can contribute to your team's continued success. I would welcome the opportunity to speak with you about this position and share more about my relevant experience.
+
+Thank you for considering my application. I look forward to hearing from you soon.
+
+Best regards,
+
+Erdem Sahin
+erdemsahin@email.com
++1 (555) 123-4567
+
+Enclosure: Resume
+
+INSTRUCTIONS:
+1. Follow the structure and tone of the reference example above
+2. Write a professional cover letter that highlights relevant experience from the CV
+3. Match the candidate's skills to the job requirements mentioned in the job description
+4. Use specific metrics and achievements when possible (like the 60% deployment time reduction in the example)
+5. Keep it concise but impactful (4-5 paragraphs)
+6. Use a professional but engaging tone
+7. Include specific examples of relevant experience and quantifiable results
+8. Show enthusiasm for the specific company and role
+9. End with a strong call to action
+10. Format it properly with appropriate greetings and closings
+11. Include contact information at the end
+
+Generate a cover letter that would help this candidate stand out for this specific position, following the quality and style of the reference example.
         `;
     }
 

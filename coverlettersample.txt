@@ -1,15 +1,19 @@
-Dear Mr. Thompson,
+Dear Hiring Manager,
 
-With this cover letter, I am applying for your Automation Engineer. For this reason, I have attached my resume for your review.
+I am writing to express my strong interest in the DevOps Engineer position at your company. With over five years of experience in cloud architecture, automation, and infrastructure management, I am excited about the opportunity to contribute to your team's success.
 
-I am applying today for this open position that I found on www.jobserve.com, as I have nine years’ experience working as an Automation Engineer in inspecting, analyzing, repairing, and managing all medical automation equipment in the company. I have a stellar track record; have great communications skills, as well as a degree in Engineering from Bradley University. I am highly accurate, creative, and have a technical mind-which offers a great combination of talent for this role.
+In my current role as a Senior DevOps Engineer, I have successfully implemented CI/CD pipelines that reduced deployment time by 60% and improved system reliability by 95%. My expertise spans across Azure WebApps, Kubernetes orchestration, and infrastructure-as-code using Terraform. I have led cross-functional teams to migrate legacy applications to cloud-native architectures, resulting in 40% cost reduction and enhanced scalability.
 
-I hope that we might meet in person to discuss this position and my possible filling of its responsibilities. I thank you to review my resume and contact me at your earliest convenience at (555)-555-5555. Thanks so much for your time and considering my background for your great opportunity.
+What particularly excites me about this opportunity is your company's commitment to innovation and cutting-edge technology. I am passionate about implementing robust monitoring solutions and automating complex deployment processes. My experience with containerization, microservices architecture, and cloud security best practices aligns perfectly with your requirements.
 
-Sincerely,
+I am eager to discuss how my technical expertise and collaborative approach can contribute to your team's continued success. I would welcome the opportunity to speak with you about this position and share more about my relevant experience.
 
-Signature
+Thank you for considering my application. I look forward to hearing from you soon.
 
-Charles Ramos
+Best regards,
 
-Encl: Resume
+Erdem Sahin
+contact@rifaterdemsahin@email.com
++44 7848024173
+
+Enclosure: Resume
