@@ -642,6 +642,14 @@ body {
     fill: #0077b5;
 }
 
+.github-link:hover svg {
+    fill: #333333;
+}
+
+.website-link:hover svg {
+    fill: #4CAF50;
+}
+
 .footer-text {
     margin: 0;
     text-align: right;
@@ -679,13 +687,24 @@ body {
     }
 }
 
+@media (max-width: 768px) {
+    .social-links {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 0.8rem;
+        width: 100%;
+        max-width: 400px;
+    }
+}
+
 @media (max-width: 480px) {
     .footer {
         padding: 1.5rem 0;
     }
     
     .social-links {
-        flex-direction: column;
+        display: grid;
+        grid-template-columns: 1fr 1fr;
         gap: 0.8rem;
         width: 100%;
     }
@@ -693,6 +712,12 @@ body {
     .social-link {
         width: 100%;
         justify-content: center;
-        padding: 0.8rem 1rem;
+        padding: 0.7rem 0.8rem;
+        font-size: 0.85rem;
+    }
+    
+    .social-link svg {
+        width: 18px;
+        height: 18px;
     }
 }
