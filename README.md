@@ -4,6 +4,8 @@ A modern, AI-powered web application that generates personalized cover letters u
 
 🌐 **Live Demo**: [https://rifaterdemsahin.github.io/coverletter/](https://rifaterdemsahin.github.io/coverletter/)
 
+⚠️ **Note**: This is a free service and may experience downtime. For reliable access, consider building your own N8N workflow using the provided templates.
+
 ## ✨ Features
 
 - **📄 PDF Upload**: Drag-and-drop or click to upload your CV in PDF format
@@ -197,6 +199,14 @@ Best regards,
 
 Enclosure: Resume
 ```
+
+## ☕ Support the Project
+
+This is a free service that I maintain in my spare time. If you find it useful, please consider:
+
+- **☕ [Buy me a coffee](https://www.buymeacoffee.com/rifaterdemsahin)** - Help keep the service running
+- **🔧 [Build your own N8N](https://github.com/rifaterdemsahin/coverletter)** - Use the provided templates for reliable access
+- **⭐ Star the repository** - Show your support and help others discover the project
 
 ## 🤝 Contributing
 

@@ -17,7 +17,7 @@
     "job-application",
     "pdf-parser"
   ],
-  "author": "Your Name",
+  "author": "Rifat Erdem Sahin",
   "license": "MIT",
   "devDependencies": {
     "serve": "^14.2.1"
@@ -28,10 +28,10 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/yourusername/ai-cover-letter-generator.git"
+    "url": "https://github.com/rifaterdemsahin/coverletter.git"
   },
   "bugs": {
-    "url": "https://github.com/yourusername/ai-cover-letter-generator/issues"
+    "url": "https://github.com/rifaterdemsahin/coverletter/issues"
   },
-  "homepage": "https://github.com/yourusername/ai-cover-letter-generator#readme"
+  "homepage": "https://github.com/rifaterdemsahin/coverletter#readme"
 }

@@ -210,6 +210,78 @@ body {
     text-align: center;
 }
 
+.support-section {
+    margin-top: 30px;
+    padding: 20px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+    backdrop-filter: blur(10px);
+}
+
+.support-notice {
+    margin-bottom: 20px;
+}
+
+.support-notice p {
+    color: #fbbf24;
+    font-size: 0.9rem;
+    font-weight: 500;
+    margin: 0;
+    padding: 10px 15px;
+    background: rgba(251, 191, 36, 0.1);
+    border-radius: 8px;
+    border: 1px solid rgba(251, 191, 36, 0.3);
+}
+
+.support-buttons {
+    display: flex;
+    gap: 15px;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.support-btn {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 20px;
+    border-radius: 10px;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 0.9rem;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.support-btn svg {
+    width: 18px;
+    height: 18px;
+}
+
+.build-btn {
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    color: white;
+    border: 2px solid transparent;
+}
+
+.build-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);
+    background: linear-gradient(135deg, #059669 0%, #047857 100%);
+}
+
+.coffee-btn {
+    background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+    color: white;
+    border: 2px solid transparent;
+}
+
+.coffee-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(245, 158, 11, 0.3);
+    background: linear-gradient(135deg, #d97706 0%, #b45309 100%);
+}
+
 .generate-btn {
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     color: white;
@@ -388,5 +460,21 @@ body {
     .action-btn {
         flex: 1;
         justify-content: center;
+    }
+    
+    .support-buttons {
+        flex-direction: column;
+        align-items: center;
+    }
+    
+    .support-btn {
+        width: 100%;
+        max-width: 280px;
+        justify-content: center;
+    }
+    
+    .support-section {
+        margin-top: 20px;
+        padding: 15px;
     }
 }
