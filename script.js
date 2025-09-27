@@ -127,12 +127,41 @@ class CoverLetterGenerator {
                 console.log('✅ Erdem Sahin CV loaded successfully');
             }
             
+            // Auto-fill name and email fields
+            this.autoFillErdemSahinInfo();
+            
             this.validateForm();
             this.showSuccess('Erdem Sahin CV loaded successfully!');
             
         } catch (error) {
             console.error('❌ Error loading Erdem Sahin CV:', error);
             this.showError('Failed to load Erdem Sahin CV. Please try again.');
+        }
+    }
+
+    autoFillErdemSahinInfo() {
+        console.log('📝 Auto-filling Erdem Sahin information...');
+        
+        // Get the form elements
+        const applicantNameField = document.getElementById('applicantName');
+        const applicantEmailField = document.getElementById('applicantEmail');
+        
+        if (applicantNameField) {
+            applicantNameField.value = 'rifaterdem sahin';
+            console.log('✅ Name field filled: rifaterdem sahin');
+        }
+        
+        if (applicantEmailField) {
+            applicantEmailField.value = 'contact@rifaterdemsahin.com';
+            console.log('✅ Email field filled: contact@rifaterdemsahin.com');
+        }
+        
+        // Trigger input events to ensure form validation works
+        if (applicantNameField) {
+            applicantNameField.dispatchEvent(new Event('input', { bubbles: true }));
+        }
+        if (applicantEmailField) {
+            applicantEmailField.dispatchEvent(new Event('input', { bubbles: true }));
         }
     }
 
@@ -203,7 +232,37 @@ Website: hello.rifaterdemsahin.com
         this.cvUpload.value = '';
         this.fileInfo.style.display = 'none';
         this.cachedCvData = null;
+        
+        // Clear auto-filled fields
+        this.clearAutoFilledFields();
+        
         this.validateForm();
+    }
+
+    clearAutoFilledFields() {
+        console.log('🧹 Clearing auto-filled fields...');
+        
+        // Get the form elements
+        const applicantNameField = document.getElementById('applicantName');
+        const applicantEmailField = document.getElementById('applicantEmail');
+        
+        if (applicantNameField) {
+            applicantNameField.value = '';
+            console.log('✅ Name field cleared');
+        }
+        
+        if (applicantEmailField) {
+            applicantEmailField.value = '';
+            console.log('✅ Email field cleared');
+        }
+        
+        // Trigger input events to ensure form validation works
+        if (applicantNameField) {
+            applicantNameField.dispatchEvent(new Event('input', { bubbles: true }));
+        }
+        if (applicantEmailField) {
+            applicantEmailField.dispatchEvent(new Event('input', { bubbles: true }));
+        }
     }
 
     processFile(file) {
