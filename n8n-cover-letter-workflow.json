@@ -1,36 +1,71 @@
 {
-  "name": "AI Cover Letter Generator",
   "nodes": [
     {
       "parameters": {
-        "content": "AI Cover Letter Generator Workflow\n\nThis workflow generates personalized cover letters using:\n- CV content from uploaded PDF\n- Job specifications from web form\n- Gemini 2.5 Flash AI model\n\nEndpoint: /webhook/cover-letter-generator",
-        "width": 800
-      },
-      "type": "n8n-nodes-base.stickyNote",
-      "position": [
-        -400,
-        -600
-      ],
-      "typeVersion": 1,
-      "id": "workflow-description",
-      "name": "Workflow Description"
-    },
-    {
-      "parameters": {
         "httpMethod": "POST",
-        "path": "cover-letter-generator",
+        "path": "d6f37ea7-92a9-462e-845c-0c0455a18e0a",
         "responseMode": "responseNode",
         "options": {}
       },
       "type": "n8n-nodes-base.webhook",
-      "typeVersion": 2,
+      "typeVersion": 2.1,
       "position": [
-        -200,
-        -300
+        -336,
+        -80
       ],
-      "id": "webhook-trigger",
-      "name": "Webhook Trigger",
-      "webhookId": "cover-letter-generator-webhook"
+      "id": "0058a844-cc49-461e-885d-210d6fddc3db",
+      "name": "Webhook",
+      "webhookId": "d6f37ea7-92a9-462e-845c-0c0455a18e0a"
+    },
+    {
+      "parameters": {
+        "chatId": "-1002793496878",
+        "text": "=triggered the cover letter > {{ $json }}\n\n---\n\nhttps://rifaterdemsahin.github.io/coverletter/",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        1008,
+        144
+      ],
+      "id": "05c61411-df08-48b5-aee3-010f4fb49660",
+      "name": "Send a text message",
+      "webhookId": "40ac5ce8-4444-4737-98d7-8f29ca248a8c",
+      "credentials": {
+        "telegramApi": {
+          "id": "FNhCBbEpIegop14Z",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "Used from here > https://rifaterdemsahin.github.io/coverletter/"
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -512,
+        -288
+      ],
+      "typeVersion": 1,
+      "id": "9f876fbf-0b17-4af1-b807-99c4fe6f3d54",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "content": "AI Cover Letter Generator Workflow\n\nThis workflow generates personalized cover letters using:\n- CV content from uploaded PDF\n- Job specifications from web form\n- Gemini 2.5 Flash AI model\n\nEndpoint: https://n8n.rifaterdemsahin.com/webhook/d6f37ea7-92a9-462e-845c-0c0455a18e0a",
+        "height": 224,
+        "width": 800
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -288,
+        -496
+      ],
+      "typeVersion": 1,
+      "id": "1ad4d0a1-2693-4799-bdae-7bf044bc1845",
+      "name": "Workflow Description"
     },
     {
       "parameters": {
@@ -39,19 +74,19 @@
             {
               "id": "cv-content",
               "name": "cvContent",
-              "value": "={{ $json.cvContent }}",
+              "value": "={{ $json.body.cvContent }}",
               "type": "string"
             },
             {
               "id": "job-specs",
               "name": "jobSpecs",
-              "value": "={{ $json.jobSpecs }}",
+              "value": "={{ $json.body.jobSpecs }}",
               "type": "object"
             },
             {
               "id": "prompt",
               "name": "prompt",
-              "value": "={{ $json.prompt }}",
+              "value": "={{ $json.body.prompt }}",
               "type": "string"
             }
           ]
@@ -61,10 +96,10 @@
       "type": "n8n-nodes-base.set",
       "typeVersion": 3.4,
       "position": [
-        0,
-        -300
+        -80,
+        160
       ],
-      "id": "extract-input-data",
+      "id": "94180bba-ed96-4558-9a8e-8a1b22b66858",
       "name": "Extract Input Data"
     },
     {
@@ -77,34 +112,11 @@
       "type": "@n8n/n8n-nodes-langchain.agent",
       "typeVersion": 2.2,
       "position": [
-        200,
-        -300
+        160,
+        -96
       ],
-      "id": "ai-agent",
+      "id": "4a0a6ba2-be9f-478a-83bb-cbd58abd5557",
       "name": "AI Agent - Cover Letter Generator"
-    },
-    {
-      "parameters": {
-        "model": "gemini/gemini-2.0-flash-exp",
-        "options": {
-          "temperature": 0.7,
-          "maxOutputTokens": 2048
-        }
-      },
-      "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
-      "typeVersion": 1,
-      "position": [
-        200,
-        -100
-      ],
-      "id": "gemini-model",
-      "name": "Gemini 2.5 Flash Model",
-      "credentials": {
-        "openRouterApi": {
-          "id": "your-openrouter-credentials-id",
-          "name": "OpenRouter account"
-        }
-      }
     },
     {
       "parameters": {
@@ -141,84 +153,29 @@
       "type": "n8n-nodes-base.set",
       "typeVersion": 3.4,
       "position": [
-        400,
-        -300
+        480,
+        144
       ],
-      "id": "format-response",
+      "id": "249b3efc-e6af-4fdf-ac3f-c337346931b6",
       "name": "Format Response"
     },
     {
       "parameters": {
-        "respondWith": "json",
-        "responseBody": "={{ $json }}",
-        "options": {}
-      },
-      "type": "n8n-nodes-base.respondToWebhook",
-      "typeVersion": 1.1,
-      "position": [
-        600,
-        -300
-      ],
-      "id": "webhook-response",
-      "name": "Webhook Response"
-    },
-    {
-      "parameters": {
-        "content": "Error Handling\n\nIf the AI generation fails, this node will catch the error and return a proper error response to the frontend.",
-        "width": 400
+        "content": "Error Handling\n\nIf the AI generation fails, this node will catch the error and return a proper error response to the frontend.\n\nIt call the core workflow",
+        "width": 400,
+        "color": 3
       },
       "type": "n8n-nodes-base.stickyNote",
       "position": [
-        400,
-        -100
+        528,
+        -608
       ],
       "typeVersion": 1,
-      "id": "error-handling-note",
+      "id": "34ed9cc2-e967-4773-8287-8a4e0a33470e",
       "name": "Error Handling Note"
     },
     {
       "parameters": {
-        "assignments": {
-          "assignments": [
-            {
-              "id": "success",
-              "name": "success",
-              "value": "=false",
-              "type": "boolean"
-            },
-            {
-              "id": "cover-letter",
-              "name": "coverLetter",
-              "value": "=null",
-              "type": "string"
-            },
-            {
-              "id": "error",
-              "name": "error",
-              "value": "=Failed to generate cover letter. Please try again.",
-              "type": "string"
-            },
-            {
-              "id": "timestamp",
-              "name": "timestamp",
-              "value": "={{ new Date().toISOString() }}",
-              "type": "string"
-            }
-          ]
-        },
-        "options": {}
-      },
-      "type": "n8n-nodes-base.set",
-      "typeVersion": 3.4,
-      "position": [
-        400,
-        100
-      ],
-      "id": "error-response",
-      "name": "Error Response"
-    },
-    {
-      "parameters": {
         "respondWith": "json",
         "responseBody": "={{ $json }}",
         "options": {}
@@ -226,16 +183,35 @@
       "type": "n8n-nodes-base.respondToWebhook",
       "typeVersion": 1.1,
       "position": [
-        600,
-        100
+        720,
+        -96
       ],
-      "id": "error-webhook-response",
-      "name": "Error Webhook Response"
+      "id": "b5f8a72f-b3b4-4882-95ea-ceb0abbcc184",
+      "name": "Webhook Response1"
+    },
+    {
+      "parameters": {
+        "model": "google/gemini-2.5-pro",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
+      "typeVersion": 1,
+      "position": [
+        160,
+        160
+      ],
+      "id": "0a1b31ee-dbd0-4a15-90cf-6c4ead3bb028",
+      "name": "OpenRouter Chat Model",
+      "credentials": {
+        "openRouterApi": {
+          "id": "e95QbimUJvBb4tqj",
+          "name": "OpenRouter account"
+        }
+      }
     }
   ],
-  "pinData": {},
   "connections": {
-    "Webhook Trigger": {
+    "Webhook": {
       "main": [
         [
           {
@@ -272,46 +248,39 @@
       "main": [
         [
           {
-            "node": "Webhook Response",
+            "node": "Webhook Response1",
             "type": "main",
             "index": 0
           }
         ]
       ]
     },
-    "Error Response": {
+    "Webhook Response1": {
       "main": [
         [
           {
-            "node": "Error Webhook Response",
+            "node": "Send a text message",
             "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenRouter Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent - Cover Letter Generator",
+            "type": "ai_languageModel",
             "index": 0
           }
         ]
       ]
     }
   },
-  "active": true,
-  "settings": {
-    "executionOrder": "v1"
-  },
-  "versionId": "cover-letter-generator-v1",
+  "pinData": {},
   "meta": {
-    "templateCredsSetupCompleted": true
-  },
-  "id": "cover-letter-generator-workflow",
-  "tags": [
-    {
-      "name": "ai"
-    },
-    {
-      "name": "cover-letter"
-    },
-    {
-      "name": "gemini"
-    },
-    {
-      "name": "automation"
-    }
-  ]
+    "templateCredsSetupCompleted": true,
+    "instanceId": "3df7c7c6cb7e0e978bf80ded11fce953795594ae8fe07b63ac449418b447c9e7"
+  }
 }
