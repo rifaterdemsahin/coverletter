@@ -178,29 +178,46 @@ class CoverLetterGenerator {
             
             let errorMessage = 'Failed to generate cover letter. ';
             let detailedError = '';
+            let troubleshootingSteps = '';
             
             if (error.message.includes('Missing required form fields')) {
                 detailedError = `Form validation failed: ${error.message}`;
                 errorMessage += detailedError;
+                troubleshootingSteps = 'Please fill in all required form fields and try again.';
             } else if (error.message.includes('PDF extraction failed')) {
                 detailedError = `PDF processing error: ${error.message}`;
                 errorMessage += detailedError;
+                troubleshootingSteps = 'Try uploading a different PDF file or ensure the PDF is not password-protected.';
             } else if (error.message.includes('N8N request failed')) {
                 detailedError = `API connection failed: ${error.message}`;
                 errorMessage += detailedError;
-            } else if (error.message.includes('Network error')) {
+                troubleshootingSteps = 'The N8N service may be temporarily unavailable. Please try again in a few minutes.';
+            } else if (error.message.includes('Failed to fetch') || error.message.includes('Network error')) {
                 detailedError = `Network connectivity issue: ${error.message}`;
                 errorMessage += detailedError;
+                troubleshootingSteps = `
+🔍 NETWORK TROUBLESHOOTING STEPS:
+1. Check your internet connection
+2. Try refreshing the page
+3. Check if the N8N endpoint is accessible: https://n8n.rifaterdemsahin.com/webhook/cover-letter-generator
+4. Disable browser extensions temporarily
+5. Try a different browser or device
+6. Check firewall/antivirus settings`;
             } else if (error.message.includes('Invalid response')) {
                 detailedError = `API response error: ${error.message}`;
                 errorMessage += detailedError;
+                troubleshootingSteps = 'The server returned an unexpected response. Please try again or contact support.';
             } else {
                 detailedError = `Unexpected error: ${error.message}`;
                 errorMessage += detailedError;
+                troubleshootingSteps = 'Please try again or contact support if the issue persists.';
             }
             
             console.error('📋 Detailed error:', detailedError);
-            this.showError(errorMessage);
+            console.error('🛠️ Troubleshooting steps:', troubleshootingSteps);
+            
+            // Show detailed error with troubleshooting steps
+            this.showError(errorMessage + '\n\n' + troubleshootingSteps);
         } finally {
             this.setLoadingState(false);
             console.log('🔄 Loading state reset');
@@ -238,33 +255,130 @@ class CoverLetterGenerator {
     }
 
     async callN8nAPI(cvContent, jobSpecs) {
-        const N8N_ENDPOINT = 'https://n8n.rifaterdemsahin.com/webhook/cover-letter-generator';
+        const N8N_ENDPOINT = 'https://n8n.rifaterdemsahin.com/webhook/d6f37ea7-92a9-462e-845c-0c0455a18e0a';
+        
+        console.log('🌐 N8N API Debug Information:');
+        console.log('📍 Endpoint:', N8N_ENDPOINT);
+        console.log('📊 CV Content Length:', cvContent.length);
+        console.log('📋 Job Specs:', jobSpecs);
 
         const requestData = {
             cvContent: cvContent,
             jobSpecs: jobSpecs,
             prompt: this.createPrompt(cvContent, jobSpecs)
         };
-
-        const response = await fetch(N8N_ENDPOINT, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(requestData)
-        });
-
-        if (!response.ok) {
-            throw new Error(`N8N request failed: ${response.status} - ${response.statusText}`);
-        }
-
-        const data = await response.json();
         
-        if (!data.success || !data.coverLetter) {
-            throw new Error(data.error || 'Invalid response from N8N endpoint');
+        console.log('📦 Request Data Size:', JSON.stringify(requestData).length, 'bytes');
+        console.log('⏰ Request Timestamp:', new Date().toISOString());
+
+        try {
+            console.log('🚀 Attempting to connect to N8N endpoint...');
+            
+            const response = await fetch(N8N_ENDPOINT, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(requestData)
+            });
+            
+            console.log('✅ Connection successful!');
+            console.log('📡 Response Status:', response.status, response.statusText);
+            console.log('📡 Response Headers:', Object.fromEntries(response.headers.entries()));
+
+            if (!response.ok) {
+                const errorText = await response.text();
+                console.error('❌ HTTP Error Response:', errorText);
+                throw new Error(`N8N request failed: ${response.status} - ${response.statusText} - ${errorText}`);
+            }
+
+            const data = await response.json();
+            console.log('📄 Response Data:', data);
+            
+            if (!data.success || !data.coverLetter) {
+                console.error('❌ Invalid Response Structure:', {
+                    success: data.success,
+                    hasCoverLetter: !!data.coverLetter,
+                    error: data.error
+                });
+                throw new Error(data.error || 'Invalid response from N8N endpoint');
+            }
+
+            console.log('✅ N8N API call successful');
+            return data.coverLetter;
+            
+        } catch (error) {
+            console.error('❌ N8N API Error Details:', {
+                name: error.name,
+                message: error.message,
+                stack: error.stack,
+                timestamp: new Date().toISOString()
+            });
+            
+            // Enhanced error classification for network issues
+            if (error.name === 'TypeError' && error.message.includes('fetch')) {
+                console.error('🔍 NETWORK CONNECTIVITY DIAGNOSIS:');
+                console.error('❌ This is a "Failed to fetch" error - network connectivity issue');
+                console.error('🔧 Possible causes:');
+                console.error('   1. No internet connection');
+                console.error('   2. DNS resolution failed');
+                console.error('   3. Firewall blocking the request');
+                console.error('   4. CORS policy blocking the request');
+                console.error('   5. N8N endpoint is down');
+                console.error('   6. Browser security settings');
+                
+                // Test basic connectivity
+                this.testConnectivity();
+                
+                throw new Error(`Network error: Failed to fetch - ${error.message}`);
+            } else if (error.message.includes('N8N request failed')) {
+                throw new Error(`API request failed: ${error.message}`);
+            } else {
+                throw error;
+            }
+        }
+    }
+
+    async testConnectivity() {
+        console.log('🔍 Running connectivity tests...');
+        
+        try {
+            // Test 1: Basic internet connectivity
+            console.log('🌐 Test 1: Checking internet connectivity...');
+            const googleResponse = await fetch('https://www.google.com', { 
+                method: 'HEAD',
+                mode: 'no-cors'
+            });
+            console.log('✅ Internet connectivity: OK');
+        } catch (error) {
+            console.error('❌ Internet connectivity: FAILED');
+            console.error('   You may not have internet access');
         }
 
-        return data.coverLetter;
+        try {
+            // Test 2: DNS resolution for N8N domain
+            console.log('🌐 Test 2: Checking DNS resolution...');
+            const dnsTest = await fetch('https://n8n.rifaterdemsahin.com', { 
+                method: 'HEAD',
+                mode: 'no-cors'
+            });
+            console.log('✅ DNS resolution: OK');
+        } catch (error) {
+            console.error('❌ DNS resolution: FAILED');
+            console.error('   Cannot resolve n8n.rifaterdemsahin.com');
+        }
+
+        try {
+            // Test 3: N8N endpoint accessibility
+            console.log('🌐 Test 3: Checking N8N endpoint...');
+            const endpointTest = await fetch('https://n8n.rifaterdemsahin.com/webhook/d6f37ea7-92a9-462e-845c-0c0455a18e0a', { 
+                method: 'OPTIONS'
+            });
+            console.log('✅ N8N endpoint: ACCESSIBLE');
+        } catch (error) {
+            console.error('❌ N8N endpoint: NOT ACCESSIBLE');
+            console.error('   Endpoint may be down or blocked');
+        }
     }
 
     createPrompt(cvContent, jobSpecs) {

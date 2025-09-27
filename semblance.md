@@ -86,6 +86,77 @@ if (!emailRegex.test(email)) {
 
 ### 3. API Communication Errors
 
+#### Error: "Failed to generate cover letter. Network connectivity issue: Failed to fetch"
+**Cause**: Network connectivity issue preventing connection to N8N endpoint
+**Solution**:
+```javascript
+// Enhanced error handling with detailed diagnostics
+catch (error) {
+    if (error.message.includes('Failed to fetch') || error.message.includes('Network error')) {
+        detailedError = `Network connectivity issue: ${error.message}`;
+        errorMessage += detailedError;
+        troubleshootingSteps = `
+🔍 NETWORK TROUBLESHOOTING STEPS:
+1. Check your internet connection
+2. Try refreshing the page
+3. Check if the N8N endpoint is accessible: https://n8n.rifaterdemsahin.com/webhook/d6f37ea7-92a9-462e-845c-0c0455a18e0a
+4. Disable browser extensions temporarily
+5. Try a different browser or device
+6. Check firewall/antivirus settings`;
+        
+        // Run connectivity diagnostics
+        this.testConnectivity();
+    }
+}
+
+// Automatic connectivity testing
+async testConnectivity() {
+    console.log('🔍 Running connectivity tests...');
+    
+    try {
+        // Test 1: Basic internet connectivity
+        console.log('🌐 Test 1: Checking internet connectivity...');
+        const googleResponse = await fetch('https://www.google.com', { 
+            method: 'HEAD',
+            mode: 'no-cors'
+        });
+        console.log('✅ Internet connectivity: OK');
+    } catch (error) {
+        console.error('❌ Internet connectivity: FAILED');
+        console.error('   You may not have internet access');
+    }
+
+    try {
+        // Test 2: DNS resolution for N8N domain
+        console.log('🌐 Test 2: Checking DNS resolution...');
+        const dnsTest = await fetch('https://n8n.rifaterdemsahin.com', { 
+            method: 'HEAD',
+            mode: 'no-cors'
+        });
+        console.log('✅ DNS resolution: OK');
+    } catch (error) {
+        console.error('❌ DNS resolution: FAILED');
+        console.error('   Cannot resolve n8n.rifaterdemsahin.com');
+    }
+
+    try {
+        // Test 3: N8N endpoint accessibility
+        console.log('🌐 Test 3: Checking N8N endpoint...');
+        const endpointTest = await fetch('https://n8n.rifaterdemsahin.com/webhook/cover-letter-generator', { 
+            method: 'OPTIONS'
+        });
+        console.log('✅ N8N endpoint: ACCESSIBLE');
+    } catch (error) {
+        console.error('❌ N8N endpoint: NOT ACCESSIBLE');
+        console.error('   Endpoint may be down or blocked');
+    }
+}
+```
+
+**Debug Information**: The console will show detailed connectivity tests and specific failure points
+**Prevention**: Network monitoring and health checks
+**User Action**: Follow the displayed troubleshooting steps
+
 #### Error: "Service temporarily unavailable. Please try again later."
 **Cause**: N8N endpoint is down or unreachable
 **Solution**:

@@ -4,7 +4,7 @@ This document describes the parameters and format required to connect to the N8N
 
 ## Endpoint Information
 
-- **URL**: `https://n8n.rifaterdemsahin.com/webhook/cover-letter-generator`
+- **URL**: `https://n8n.rifaterdemsahin.com/webhook/d6f37ea7-92a9-462e-845c-0c0455a18e0a`
 - **Method**: `POST`
 - **Content-Type**: `application/json`
 
@@ -165,7 +165,7 @@ You can test the webhook connection using tools like:
 
 Example curl command:
 ```bash
-curl -X POST https://n8n.rifaterdemsahin.com/webhook/cover-letter-generator \
+curl -X POST https://n8n.rifaterdemsahin.com/webhook/d6f37ea7-92a9-462e-845c-0c0455a18e0a \
   -H "Content-Type: application/json" \
   -d '{
     "cvContent": "Your CV content here...",

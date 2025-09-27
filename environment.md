@@ -61,7 +61,7 @@ npx serve . -p 8000
 Create a `.env` file for local development:
 ```env
 # N8N Backend Configuration
-N8N_ENDPOINT=https://n8n.rifaterdemsahin.com/webhook/cover-letter-generator
+N8N_ENDPOINT=https://n8n.rifaterdemsahin.com/webhook/d6f37ea7-92a9-462e-845c-0c0455a18e0a
 
 # Development Settings
 DEBUG_MODE=true
@@ -78,10 +78,11 @@ GEMINI_MAX_TOKENS=2048
 ### N8N Backend Configuration
 
 #### Endpoint Configuration
-- **Production URL**: `https://n8n.rifaterdemsahin.com/webhook/cover-letter-generator`
+- **Production URL**: `https://n8n.rifaterdemsahin.com/webhook/d6f37ea7-92a9-462e-845c-0c0455a18e0a`
 - **Method**: POST
 - **Content-Type**: application/json
 - **Authentication**: API key managed by N8N workflow
+- **Webhook ID**: `d6f37ea7-92a9-462e-845c-0c0455a18e0a`
 
 #### N8N Workflow Requirements
 ```json
@@ -93,7 +94,7 @@ GEMINI_MAX_TOKENS=2048
         "type": "webhook",
         "name": "Cover Letter Webhook",
         "parameters": {
-          "path": "cover-letter-generator",
+          "path": "d6f37ea7-92a9-462e-845c-0c0455a18e0a",
           "httpMethod": "POST"
         }
       },
@@ -275,7 +276,7 @@ const logging = {
 ### Frontend Environment Variables
 ```env
 # API Configuration
-VITE_N8N_ENDPOINT=https://n8n.rifaterdemsahin.com/webhook/cover-letter-generator
+VITE_N8N_ENDPOINT=https://n8n.rifaterdemsahin.com/webhook/d6f37ea7-92a9-462e-845c-0c0455a18e0a
 VITE_API_TIMEOUT=30000
 
 # Feature Flags
@@ -297,7 +298,7 @@ GEMINI_TEMPERATURE=0.7
 GEMINI_MAX_TOKENS=2048
 
 # N8N Configuration
-N8N_WEBHOOK_URL=https://n8n.rifaterdemsahin.com/webhook/cover-letter-generator
+N8N_WEBHOOK_URL=https://n8n.rifaterdemsahin.com/webhook/d6f37ea7-92a9-462e-845c-0c0455a18e0a
 N8N_RATE_LIMIT=60
 N8N_TIMEOUT=30000
 
@@ -320,7 +321,7 @@ python -m http.server 8000
 #### API Connection Issues
 ```bash
 # Check N8N endpoint accessibility
-curl -X POST https://n8n.rifaterdemsahin.com/webhook/cover-letter-generator \
+curl -X POST https://n8n.rifaterdemsahin.com/webhook/d6f37ea7-92a9-462e-845c-0c0455a18e0a \
   -H "Content-Type: application/json" \
   -d '{"test": "connection"}'
 ```
@@ -341,7 +342,7 @@ curl -w "@curl-format.txt" -o /dev/null -s https://your-domain.com
 
 # Monitor API endpoint
 curl -w "@curl-format.txt" -o /dev/null -s \
-  -X POST https://n8n.rifaterdemsahin.com/webhook/cover-letter-generator
+  -X POST https://n8n.rifaterdemsahin.com/webhook/d6f37ea7-92a9-462e-845c-0c0455a18e0a
 ```
 
 #### Error Logging
