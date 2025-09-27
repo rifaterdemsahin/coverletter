@@ -1,0 +1,317 @@
+{
+  "name": "AI Cover Letter Generator",
+  "nodes": [
+    {
+      "parameters": {
+        "content": "AI Cover Letter Generator Workflow\n\nThis workflow generates personalized cover letters using:\n- CV content from uploaded PDF\n- Job specifications from web form\n- Gemini 2.5 Flash AI model\n\nEndpoint: /webhook/cover-letter-generator",
+        "width": 800
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -400,
+        -600
+      ],
+      "typeVersion": 1,
+      "id": "workflow-description",
+      "name": "Workflow Description"
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "cover-letter-generator",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        -200,
+        -300
+      ],
+      "id": "webhook-trigger",
+      "name": "Webhook Trigger",
+      "webhookId": "cover-letter-generator-webhook"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "cv-content",
+              "name": "cvContent",
+              "value": "={{ $json.cvContent }}",
+              "type": "string"
+            },
+            {
+              "id": "job-specs",
+              "name": "jobSpecs",
+              "value": "={{ $json.jobSpecs }}",
+              "type": "object"
+            },
+            {
+              "id": "prompt",
+              "name": "prompt",
+              "value": "={{ $json.prompt }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        0,
+        -300
+      ],
+      "id": "extract-input-data",
+      "name": "Extract Input Data"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=**Persona:**\nYou are an expert cover letter writer with extensive experience in creating compelling, professional cover letters that help candidates stand out in competitive job markets.\n\n**Task:**\nGenerate a personalized, professional cover letter based on the provided CV content and job specifications. The cover letter should be ready to send and demonstrate a clear match between the candidate's skills and the job requirements.\n\n**Instructions:**\n\n1. **Analyze the CV Content**: Review the candidate's experience, skills, education, and achievements\n2. **Review Job Requirements**: Understand the specific role, company, and key requirements\n3. **Create a Professional Structure**:\n   - Professional greeting (use \"Dear Hiring Manager\" if no specific name provided)\n   - Opening paragraph expressing interest and highlighting key qualifications\n   - 2-3 body paragraphs with specific examples and achievements\n   - Closing paragraph with call to action\n   - Professional sign-off with contact information\n\n4. **Key Requirements**:\n   - Use specific metrics and quantifiable achievements when possible\n   - Match candidate's experience to job requirements\n   - Show enthusiasm for the specific company and role\n   - Maintain professional but engaging tone\n   - Keep length to 4-5 paragraphs (300-400 words)\n   - Include contact information at the end\n\n5. **Output Format**:\n   - Return only the cover letter text\n   - No additional commentary or explanations\n   - Proper formatting with line breaks\n   - Include candidate's name, email, and phone at the end\n\n**INPUT DATA**\n\n**CV Content:**\n```\n{{ $json.cvContent }}\n```\n\n**Job Specifications:**\n```\nCompany: {{ $json.jobSpecs.companyName }}\nPosition: {{ $json.jobSpecs.jobTitle }}\nJob Description: {{ $json.jobSpecs.jobDescription }}\nApplicant Name: {{ $json.jobSpecs.applicantName }}\nApplicant Email: {{ $json.jobSpecs.applicantEmail }}\n```\n\n**Reference Example:**\nDear Hiring Manager,\n\nI am writing to express my strong interest in the DevOps Engineer position at your company. With over five years of experience in cloud architecture, automation, and infrastructure management, I am excited about the opportunity to contribute to your team's success.\n\nIn my current role as a Senior DevOps Engineer, I have successfully implemented CI/CD pipelines that reduced deployment time by 60% and improved system reliability by 95%. My expertise spans across Azure WebApps, Kubernetes orchestration, and infrastructure-as-code using Terraform.\n\nWhat particularly excites me about this opportunity is your company's commitment to innovation and cutting-edge technology. I am passionate about implementing robust monitoring solutions and automating complex deployment processes.\n\nI am eager to discuss how my technical expertise and collaborative approach can contribute to your team's continued success. I would welcome the opportunity to speak with you about this position.\n\nThank you for considering my application. I look forward to hearing from you soon.\n\nBest regards,\n\n[Applicant Name]\n[Applicant Email]\n[Applicant Phone]\n\nEnclosure: Resume",
+        "hasOutputParser": true,
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.2,
+      "position": [
+        200,
+        -300
+      ],
+      "id": "ai-agent",
+      "name": "AI Agent - Cover Letter Generator"
+    },
+    {
+      "parameters": {
+        "model": "gemini/gemini-2.0-flash-exp",
+        "options": {
+          "temperature": 0.7,
+          "maxOutputTokens": 2048
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
+      "typeVersion": 1,
+      "position": [
+        200,
+        -100
+      ],
+      "id": "gemini-model",
+      "name": "Gemini 2.5 Flash Model",
+      "credentials": {
+        "openRouterApi": {
+          "id": "your-openrouter-credentials-id",
+          "name": "OpenRouter account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "success",
+              "name": "success",
+              "value": "=true",
+              "type": "boolean"
+            },
+            {
+              "id": "cover-letter",
+              "name": "coverLetter",
+              "value": "={{ $json.output }}",
+              "type": "string"
+            },
+            {
+              "id": "error",
+              "name": "error",
+              "value": "=null",
+              "type": "string"
+            },
+            {
+              "id": "timestamp",
+              "name": "timestamp",
+              "value": "={{ new Date().toISOString() }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        400,
+        -300
+      ],
+      "id": "format-response",
+      "name": "Format Response"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ $json }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [
+        600,
+        -300
+      ],
+      "id": "webhook-response",
+      "name": "Webhook Response"
+    },
+    {
+      "parameters": {
+        "content": "Error Handling\n\nIf the AI generation fails, this node will catch the error and return a proper error response to the frontend.",
+        "width": 400
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        400,
+        -100
+      ],
+      "typeVersion": 1,
+      "id": "error-handling-note",
+      "name": "Error Handling Note"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "success",
+              "name": "success",
+              "value": "=false",
+              "type": "boolean"
+            },
+            {
+              "id": "cover-letter",
+              "name": "coverLetter",
+              "value": "=null",
+              "type": "string"
+            },
+            {
+              "id": "error",
+              "name": "error",
+              "value": "=Failed to generate cover letter. Please try again.",
+              "type": "string"
+            },
+            {
+              "id": "timestamp",
+              "name": "timestamp",
+              "value": "={{ new Date().toISOString() }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        400,
+        100
+      ],
+      "id": "error-response",
+      "name": "Error Response"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ $json }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [
+        600,
+        100
+      ],
+      "id": "error-webhook-response",
+      "name": "Error Webhook Response"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Webhook Trigger": {
+      "main": [
+        [
+          {
+            "node": "Extract Input Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract Input Data": {
+      "main": [
+        [
+          {
+            "node": "AI Agent - Cover Letter Generator",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent - Cover Letter Generator": {
+      "main": [
+        [
+          {
+            "node": "Format Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Format Response": {
+      "main": [
+        [
+          {
+            "node": "Webhook Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Error Response": {
+      "main": [
+        [
+          {
+            "node": "Error Webhook Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "cover-letter-generator-v1",
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "id": "cover-letter-generator-workflow",
+  "tags": [
+    {
+      "name": "ai"
+    },
+    {
+      "name": "cover-letter"
+    },
+    {
+      "name": "gemini"
+    },
+    {
+      "name": "automation"
+    }
+  ]
+}

@@ -34,6 +34,7 @@ A modern, AI-powered web application that generates personalized cover letters u
 - Modern web browser with JavaScript enabled
 - Local web server (Python, Node.js, or any static server)
 - N8N backend endpoint configured (for production use)
+- OpenRouter API account with Gemini 2.5 Flash access
 
 ### Setup
 
@@ -43,11 +44,17 @@ A modern, AI-powered web application that generates personalized cover letters u
    cd coverletter
    ```
 
-2. **Configure N8N Endpoint (Optional for local development)**
-   - The app uses `https://n8n.rifaterdemsahin.com/webhook/cover-letter-generator` by default
-   - For local development, you can modify the endpoint in `script.js` if needed
+2. **Set up N8N Backend**
+   - Import the `n8n-cover-letter-workflow.json` template into your N8N instance
+   - Follow the detailed setup guide in `n8n-setup-guide.md`
+   - Configure OpenRouter API credentials for Gemini 2.5 Flash access
+   - Get your webhook URL from the N8N workflow
 
-3. **Start a Local Server**
+3. **Configure Frontend Endpoint**
+   - Update the `N8N_ENDPOINT` in `script.js` with your webhook URL
+   - The endpoint should be: `https://your-n8n-instance.com/webhook/cover-letter-generator`
+
+4. **Start a Local Server**
    
    **Option 1: Using Python (Recommended)**
    ```bash
@@ -60,7 +67,7 @@ A modern, AI-powered web application that generates personalized cover letters u
    npm run serve
    ```
 
-4. **Open in Browser**
+5. **Open in Browser**
    - Navigate to `http://localhost:8000`
    - Start generating cover letters!
 
@@ -68,15 +75,17 @@ A modern, AI-powered web application that generates personalized cover letters u
 
 ```
 /
-├── index.html              # Main HTML structure
-├── styles.css              # CSS styling and animations
-├── script.js               # JavaScript functionality and API integration
-├── package.json            # Project configuration and dependencies
-├── README.md              # Project documentation
-├── cursor.md              # Development documentation
-├── formula.md             # Project logic and design decisions
-├── coverletter_template.json  # Template data
-└── coverlettersample.txt      # Sample cover letter
+├── index.html                    # Main HTML structure
+├── styles.css                    # CSS styling and animations
+├── script.js                     # JavaScript functionality and API integration
+├── package.json                  # Project configuration and dependencies
+├── README.md                    # Project documentation
+├── cursor.md                    # Development documentation
+├── formula.md                   # Project logic and design decisions
+├── n8n-cover-letter-workflow.json # N8N workflow template
+├── n8n-setup-guide.md           # N8N setup instructions
+├── coverletter_template.json    # Template data
+└── coverlettersample.txt        # Sample cover letter
 ```
 
 ## 🎨 Design Features
@@ -91,13 +100,14 @@ A modern, AI-powered web application that generates personalized cover letters u
 
 The application uses Google's Gemini 2.5 Flash model via a secure N8N backend:
 
-- **Backend**: N8N workflow at `https://n8n.rifaterdemsahin.com/webhook/cover-letter-generator`
-- **Model**: `gemini-2.0-flash-exp`
+- **Backend**: N8N workflow template included (`n8n-cover-letter-workflow.json`)
+- **Model**: `gemini-2.0-flash-exp` via OpenRouter
 - **Temperature**: 0.7 (balanced creativity and consistency)
 - **Max Tokens**: 2048 (sufficient for cover letter length)
 - **Prompt Engineering**: Advanced prompts that analyze CV and job requirements
 - **Quality Control**: Reference examples ensure consistent, professional output
 - **Security**: API keys stored securely on the backend, not exposed to the frontend
+- **Setup Guide**: Complete instructions in `n8n-setup-guide.md`
 
 ## 📊 How It Works
 
@@ -200,11 +210,12 @@ Contributions are welcome! Here's how you can help:
 
 ### Areas for Contribution
 - PDF text extraction implementation
-- N8N workflow enhancements
+- N8N workflow enhancements and new templates
 - Additional AI model integrations
 - UI/UX improvements
 - Performance optimizations
 - Documentation enhancements
+- N8N workflow testing and validation
 
 ## 📄 License
 
@@ -229,7 +240,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 - ✅ **Live Demo**: Deployed and accessible
 - ✅ **Documentation**: Comprehensive docs included
 - 🔄 **Continuous Improvement**: Regular updates and enhancements
-- 🚀 **Future Features**: Real PDF parsing, user accounts, templates, enhanced N8N workflows
+- 🚀 **Future Features**: Real PDF parsing, user accounts, templates, enhanced N8N workflows, multiple AI model support
 
 ---
 
