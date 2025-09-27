@@ -24,13 +24,18 @@ A modern, AI-powered web application that generates personalized cover letters u
 
 ```
 /
-├── index.html          # Main HTML structure
-├── styles.css          # CSS styling and animations
-├── script.js           # JavaScript functionality and API integration
-├── package.json        # Project configuration and dependencies
-├── cursor.md          # Project documentation
-├── coverletter_template.json  # Template data (existing)
-└── coverlettersample.txt      # Sample cover letter (existing)
+├── index.html                    # Main HTML structure
+├── styles.css                    # CSS styling and animations
+├── script.js                     # JavaScript functionality and API integration
+├── package.json                  # Project configuration and dependencies
+├── cursor.md                     # Project documentation
+├── CHANGELOG.md                  # Detailed version history and changes
+├── LICENSE                       # MIT License
+├── formula_techstack.md          # Comprehensive technology stack documentation
+├── semblance.md                  # Error handling and troubleshooting guide
+├── n8n-cover-letter-workflow.json # N8N workflow configuration
+├── coverletter_template.json     # Template data (existing)
+└── coverlettersample.txt         # Sample cover letter (existing)
 ```
 
 ## Setup Instructions
@@ -220,7 +225,24 @@ localStorage.setItem('debug', 'true');
 
 ## Version History
 
-*This section tracks version iterations with each push and major update.*
+*This section tracks version iterations with each push and major update. For detailed changelog, see [CHANGELOG.md](./CHANGELOG.md).*
+
+### Version 1.1.0 (2025-01-27) - Enhanced Release
+- **Build**: 2025-01-27
+- **Features**: 
+  - ✅ Working N8N workflow integration with proper error handling
+  - ✅ Enhanced error messages with detailed troubleshooting steps
+  - ✅ Telegram monitoring and notifications for usage tracking
+  - ✅ Social media footer with YouTube and LinkedIn links
+  - ✅ Comprehensive documentation (tech stack, troubleshooting guides)
+  - ✅ Performance metrics and 2-minute generation time documentation
+  - ✅ Post-generation UI elements with copy/download functionality
+- **Technical**: 
+  - Frontend: HTML5, CSS3, JavaScript (ES6+) with enhanced error handling
+  - Backend: N8N workflow with webhook ID `d6f37ea7-92a9-462e-845c-0c0455a18e0a`
+  - AI Model: Google Gemini 2.5 Pro via OpenRouter
+  - Monitoring: Telegram Bot API integration
+  - Documentation: CHANGELOG.md, MIT License, Tech Stack documentation
 
 ### Version 1.0.0 (2025-01-27) - Initial Release
 - **Build**: 2025-01-27
@@ -230,14 +252,14 @@ localStorage.setItem('debug', 'true');
   - N8N backend integration with Gemini 2.5 Flash API
   - Modern responsive UI with real-time validation
   - Copy and download functionality
-  - Comprehensive error handling and debugging
+  - Basic error handling and debugging
 - **Technical**: 
   - Frontend: HTML5, CSS3, JavaScript (ES6+)
   - Backend: N8N workflow with webhook ID `d6f37ea7-92a9-462e-845c-0c0455a18e0a`
   - AI Model: Gemini 2.0 Flash Experimental
   - Version tracking system implemented
 
-### Version Management
+### Version Management & Changelog
 
 **Version Numbering Convention:**
 - **Major Version (X.0.0)**: Significant feature additions or breaking changes
@@ -252,12 +274,47 @@ localStorage.setItem('debug', 'true');
 5. **Update locations**: 
    - `package.json` version field
    - `index.html` version badge and date
+   - `CHANGELOG.md` with detailed changes
    - This version history section
+
+**Changelog Management:**
+- **Primary Changelog**: `CHANGELOG.md` - Detailed, structured changelog following [Keep a Changelog](https://keepachangelog.com/) format
+- **Summary Changelog**: This section - Brief overview of major changes
+- **Update Process**: 
+  1. Make changes to the codebase
+  2. Update version number in `index.html`
+  3. Add entry to `CHANGELOG.md` with:
+     - Version number and date
+     - Added/Changed/Fixed/Removed sections
+     - Technical details and impact
+  4. Update this version history section
+  5. Commit with descriptive message
+
+**Changelog Entry Template:**
+```markdown
+## [X.Y.Z] - YYYY-MM-DD
+
+### Added
+- New features and functionality
+
+### Changed
+- Changes to existing functionality
+
+### Fixed
+- Bug fixes and corrections
+
+### Removed
+- Removed features or functionality
+
+### Technical Details
+- API changes, performance improvements, etc.
+```
 
 **Version Display:**
 - Version badge visible on main page header
 - Includes version number and build date
 - Styled with glassmorphism design for modern appearance
+- Links to detailed changelog for full history
 
 ## Contributing
 
@@ -269,7 +326,9 @@ localStorage.setItem('debug', 'true');
 
 ## License
 
-MIT License - see LICENSE file for details
+MIT License - see [LICENSE](./LICENSE) file for details
+
+Copyright (c) 2025 Rifat Erdem Sahin
 
 ## Support
 
