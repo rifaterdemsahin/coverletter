@@ -1,6 +1,7 @@
 class CoverLetterGenerator {
     constructor() {
         this.cvFile = null;
+        this.N8N_ENDPOINT = 'https://n8n.rifaterdemsahin.com/webhook/d6f37ea7-92a9-462e-845c-0c0455a18e0a';
         this.initializeElements();
         this.attachEventListeners();
     }
@@ -195,11 +196,12 @@ class CoverLetterGenerator {
             } else if (error.message.includes('Failed to fetch') || error.message.includes('Network error')) {
                 detailedError = `Network connectivity issue: ${error.message}`;
                 errorMessage += detailedError;
+                errorMessage += `\n\n🔗 URL called: ${this.N8N_ENDPOINT}`;
                 troubleshootingSteps = `
 🔍 NETWORK TROUBLESHOOTING STEPS:
 1. Check your internet connection
 2. Try refreshing the page
-3. Check if the N8N endpoint is accessible: https://n8n.rifaterdemsahin.com/webhook/cover-letter-generator
+3. Check if the N8N endpoint is accessible: ${this.N8N_ENDPOINT}
 4. Disable browser extensions temporarily
 5. Try a different browser or device
 6. Check firewall/antivirus settings`;
@@ -255,7 +257,7 @@ class CoverLetterGenerator {
     }
 
     async callN8nAPI(cvContent, jobSpecs) {
-        const N8N_ENDPOINT = 'https://n8n.rifaterdemsahin.com/webhook/d6f37ea7-92a9-462e-845c-0c0455a18e0a';
+        const N8N_ENDPOINT = this.N8N_ENDPOINT;
         
         console.log('🌐 N8N API Debug Information:');
         console.log('📍 Endpoint:', N8N_ENDPOINT);
@@ -371,7 +373,7 @@ class CoverLetterGenerator {
         try {
             // Test 3: N8N endpoint accessibility
             console.log('🌐 Test 3: Checking N8N endpoint...');
-            const endpointTest = await fetch('https://n8n.rifaterdemsahin.com/webhook/d6f37ea7-92a9-462e-845c-0c0455a18e0a', { 
+            const endpointTest = await fetch(this.N8N_ENDPOINT, { 
                 method: 'OPTIONS'
             });
             console.log('✅ N8N endpoint: ACCESSIBLE');
