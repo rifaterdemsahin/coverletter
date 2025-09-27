@@ -138,14 +138,18 @@ class CoverLetterGenerator {
             const formData = new FormData(this.jobSpecsForm);
             const jobSpecs = Object.fromEntries(formData.entries());
 
-            // Generate cover letter using Gemini 2.5
-            const coverLetter = await this.callGeminiAPI(pdfContent, jobSpecs);
+            // Generate cover letter using N8N endpoint
+            const coverLetter = await this.callN8nAPI(pdfContent, jobSpecs);
             
             this.displayResult(coverLetter);
             this.showSuccess();
         } catch (error) {
             console.error('Error generating cover letter:', error);
-            this.showError('Failed to generate cover letter. Please try again.');
+            if (error.message.includes('N8N request failed')) {
+                this.showError('Service temporarily unavailable. Please try again later.');
+            } else {
+                this.showError('Failed to generate cover letter. Please try again.');
+            }
         } finally {
             this.setLoadingState(false);
         }
@@ -181,44 +185,34 @@ class CoverLetterGenerator {
         });
     }
 
-    async callGeminiAPI(cvContent, jobSpecs) {
-        // Note: Replace with your actual Gemini API key
-        const API_KEY = 'YOUR_GEMINI_API_KEY_HERE';
-        const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent?key=${API_KEY}`;
+    async callN8nAPI(cvContent, jobSpecs) {
+        const N8N_ENDPOINT = 'https://n8n.rifaterdemsahin.com/webhook/cover-letter-generator';
 
-        const prompt = this.createPrompt(cvContent, jobSpecs);
+        const requestData = {
+            cvContent: cvContent,
+            jobSpecs: jobSpecs,
+            prompt: this.createPrompt(cvContent, jobSpecs)
+        };
 
-        const response = await fetch(API_URL, {
+        const response = await fetch(N8N_ENDPOINT, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify({
-                contents: [{
-                    parts: [{
-                        text: prompt
-                    }]
-                }],
-                generationConfig: {
-                    temperature: 0.7,
-                    topK: 40,
-                    topP: 0.95,
-                    maxOutputTokens: 2048,
-                }
-            })
+            body: JSON.stringify(requestData)
         });
 
         if (!response.ok) {
-            throw new Error(`API request failed: ${response.status}`);
+            throw new Error(`N8N request failed: ${response.status} - ${response.statusText}`);
         }
 
         const data = await response.json();
         
-        if (!data.candidates || !data.candidates[0] || !data.candidates[0].content) {
-            throw new Error('Invalid response from Gemini API');
+        if (!data.success || !data.coverLetter) {
+            throw new Error(data.error || 'Invalid response from N8N endpoint');
         }
 
-        return data.candidates[0].content.parts[0].text;
+        return data.coverLetter;
     }
 
     createPrompt(cvContent, jobSpecs) {
