@@ -218,6 +218,47 @@ localStorage.setItem('debug', 'true');
 - [ ] Enhanced N8N workflows with additional AI models
 - [ ] Backend analytics and usage tracking
 
+## Version History
+
+*This section tracks version iterations with each push and major update.*
+
+### Version 1.0.0 (2025-01-27) - Initial Release
+- **Build**: 2025-01-27
+- **Features**: 
+  - Core AI cover letter generation functionality
+  - PDF upload with drag-and-drop support
+  - N8N backend integration with Gemini 2.5 Flash API
+  - Modern responsive UI with real-time validation
+  - Copy and download functionality
+  - Comprehensive error handling and debugging
+- **Technical**: 
+  - Frontend: HTML5, CSS3, JavaScript (ES6+)
+  - Backend: N8N workflow with webhook ID `d6f37ea7-92a9-462e-845c-0c0455a18e0a`
+  - AI Model: Gemini 2.0 Flash Experimental
+  - Version tracking system implemented
+
+### Version Management
+
+**Version Numbering Convention:**
+- **Major Version (X.0.0)**: Significant feature additions or breaking changes
+- **Minor Version (1.X.0)**: New features, improvements, or API changes
+- **Patch Version (1.0.X)**: Bug fixes, security updates, or minor improvements
+
+**Version Update Process:**
+1. **For each push**: Update patch version (1.0.X → 1.0.X+1)
+2. **For major updates**: Update minor version (1.0.X → 1.1.0)
+3. **For breaking changes**: Update major version (1.0.X → 2.0.0)
+4. **Build date**: Automatically updated to current date
+5. **Update locations**: 
+   - `package.json` version field
+   - `index.html` version badge and date
+   - This version history section
+
+**Version Display:**
+- Version badge visible on main page header
+- Includes version number and build date
+- Styled with glassmorphism design for modern appearance
+
 ## Contributing
 
 1. Fork the repository
