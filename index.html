@@ -13,7 +13,7 @@
             <h1>AI Cover Letter Generator</h1>
             <p>Upload your CV and job specifications to generate a personalized cover letter using AI</p>
             <div class="version-info">
-                <span class="version-badge">v1.1.0</span>
+                <span class="version-badge">v1.2.0</span>
                 <span class="version-date">Build 2025-01-27</span>
             </div>
         </header>
@@ -22,6 +22,18 @@
             <div class="upload-section">
                 <div class="upload-card">
                     <h2>Upload Your CV</h2>
+                    
+                    <!-- CV Selection Dropdown -->
+                    <div class="cv-selection-section">
+                        <div class="form-group">
+                            <label for="cvSelection">Select CV Source</label>
+                            <select id="cvSelection" class="cv-select">
+                                <option value="upload">Upload New CV</option>
+                                <option value="erdem-sahin">Load Erdem Sahin CV (Sample)</option>
+                            </select>
+                        </div>
+                    </div>
+
                     <div class="upload-area" id="uploadArea">
                         <div class="upload-content">
                             <svg class="upload-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -199,6 +211,31 @@ info@pexabo.com
                 <polyline points="22,4 12,14.01 9,11.01"></polyline>
             </svg>
             <span>Cover letter generated successfully!</span>
+        </div>
+
+        <!-- Debug Section -->
+        <div class="debug-section" id="debugSection" style="display: none;">
+            <div class="debug-card">
+                <h2>🐛 Debug Information</h2>
+                <div class="debug-content">
+                    <div class="debug-item">
+                        <label>Current Prompt:</label>
+                        <textarea id="debugPrompt" readonly rows="10" placeholder="Prompt will appear here after generation..."></textarea>
+                    </div>
+                    <div class="debug-item">
+                        <label>CV Content Length:</label>
+                        <span id="debugCvLength">0 characters</span>
+                    </div>
+                    <div class="debug-item">
+                        <label>Selected CV Source:</label>
+                        <span id="debugCvSource">None selected</span>
+                    </div>
+                    <div class="debug-item">
+                        <label>Form Data:</label>
+                        <textarea id="debugFormData" readonly rows="5" placeholder="Form data will appear here..."></textarea>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 
