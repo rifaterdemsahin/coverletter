@@ -4,6 +4,7 @@ class CoverLetterGenerator {
         this.N8N_ENDPOINT = 'https://n8n.rifaterdemsahin.com/webhook/d6f37ea7-92a9-462e-845c-0c0455a18e0a';
         this.initializeElements();
         this.attachEventListeners();
+        this.initializePDFJS();
     }
 
     initializeElements() {
@@ -44,6 +45,24 @@ class CoverLetterGenerator {
 
         // CV data cache
         this.cachedCvData = null;
+    }
+
+    initializePDFJS() {
+        // Wait for PDF.js to load and set up worker
+        const checkPDFJS = () => {
+            if (typeof window.pdfjsLib !== 'undefined') {
+                console.log('✅ PDF.js library loaded successfully');
+                // Set up the worker
+                window.pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+                console.log('✅ PDF.js worker configured');
+            } else {
+                console.log('⏳ Waiting for PDF.js library to load...');
+                setTimeout(checkPDFJS, 100);
+            }
+        };
+        
+        // Start checking for PDF.js
+        checkPDFJS();
     }
 
     attachEventListeners() {
@@ -451,7 +470,17 @@ Website: hello.rifaterdemsahin.com
             } else if (error.message.includes('PDF extraction failed')) {
                 detailedError = `PDF processing error: ${error.message}`;
                 errorMessage += detailedError;
-                troubleshootingSteps = 'Try uploading a different PDF file or ensure the PDF is not password-protected.';
+                troubleshootingSteps = `🔍 PDF PROCESSING TROUBLESHOOTING:
+1. Ensure the PDF is not password-protected
+2. Try uploading a different PDF file
+3. Make sure the PDF contains selectable text (not just images)
+4. Check if the PDF file is corrupted
+5. Try converting the PDF to a different format first
+6. Ensure the PDF file is not corrupted
+
+💡 TIP: If you continue having issues, try using the "Load Erdem Sahin CV (Sample)" option to test the system.
+
+If the issue persists, try using the sample CV option or contact support.`;
             } else if (error.message.includes('N8N request failed')) {
                 detailedError = `API connection failed: ${error.message}`;
                 errorMessage += detailedError;
@@ -514,17 +543,26 @@ Website: hello.rifaterdemsahin.com
                 try {
                     const arrayBuffer = event.target.result;
                     
-                    // Import PDF.js library dynamically
-                    const pdfjsLib = window.pdfjsLib || await import('https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js');
-                    
-                    if (!window.pdfjsLib) {
-                        window.pdfjsLib = pdfjsLib;
-                        // Set up PDF.js worker
-                        pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+                    // Check if PDF.js is loaded
+                    if (typeof window.pdfjsLib === 'undefined') {
+                        throw new Error('PDF.js library not loaded. Please refresh the page and try again.');
                     }
                     
-                    const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+                    // Verify PDF.js is properly initialized
+                    if (typeof window.pdfjsLib.getDocument !== 'function') {
+                        throw new Error('PDF.js getDocument function not available. The library may not be properly loaded.');
+                    }
+                    
+                    // Set up PDF.js worker if not already set
+                    if (!window.pdfjsLib.GlobalWorkerOptions.workerSrc) {
+                        window.pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+                    }
+                    
+                    console.log('📄 Starting PDF text extraction...');
+                    const pdf = await window.pdfjsLib.getDocument({ data: arrayBuffer }).promise;
                     let fullText = '';
+                    
+                    console.log('📄 PDF loaded, extracting text from', pdf.numPages, 'pages...');
                     
                     // Extract text from all pages
                     for (let pageNum = 1; pageNum <= pdf.numPages; pageNum++) {
@@ -532,6 +570,7 @@ Website: hello.rifaterdemsahin.com
                         const textContent = await page.getTextContent();
                         const pageText = textContent.items.map(item => item.str).join(' ');
                         fullText += pageText + '\n';
+                        console.log(`📄 Page ${pageNum} processed`);
                     }
                     
                     if (fullText.trim().length === 0) {
@@ -545,6 +584,23 @@ Website: hello.rifaterdemsahin.com
                     resolve(fullText);
                 } catch (error) {
                     console.error('❌ PDF extraction error:', error);
+                    
+                    // Try fallback method if PDF.js fails
+                    if (error.message.includes('PDF.js') || error.message.includes('getDocument')) {
+                        console.log('🔄 Attempting fallback PDF processing...');
+                        try {
+                            // Fallback: Try to extract text using a different approach
+                            const fallbackText = await this.fallbackPDFExtraction(arrayBuffer);
+                            if (fallbackText && fallbackText.trim().length > 0) {
+                                console.log('✅ Fallback PDF extraction successful');
+                                resolve(fallbackText);
+                                return;
+                            }
+                        } catch (fallbackError) {
+                            console.error('❌ Fallback PDF extraction also failed:', fallbackError);
+                        }
+                    }
+                    
                     reject(new Error(`PDF extraction failed: ${error.message}`));
                 }
             };
@@ -555,6 +611,50 @@ Website: hello.rifaterdemsahin.com
             
             reader.readAsArrayBuffer(file);
         });
+    }
+
+    async fallbackPDFExtraction(arrayBuffer) {
+        // Fallback method for PDF text extraction
+        // This is a basic implementation that might work for some PDFs
+        console.log('🔄 Using fallback PDF extraction method...');
+        
+        try {
+            // Convert ArrayBuffer to Uint8Array
+            const uint8Array = new Uint8Array(arrayBuffer);
+            
+            // Try to find text content in the PDF binary data
+            // This is a very basic approach and may not work for all PDFs
+            const textDecoder = new TextDecoder('utf-8', { fatal: false });
+            const text = textDecoder.decode(uint8Array);
+            
+            // Extract text between common PDF text markers
+            const textMatches = text.match(/BT\s+.*?\s+ET/g);
+            if (textMatches && textMatches.length > 0) {
+                let extractedText = '';
+                textMatches.forEach(match => {
+                    // Extract text content from PDF text objects
+                    const textContent = match.replace(/BT\s+/, '').replace(/\s+ET/, '');
+                    extractedText += textContent + ' ';
+                });
+                
+                if (extractedText.trim().length > 0) {
+                    console.log('✅ Fallback extraction found text content');
+                    return extractedText.trim();
+                }
+            }
+            
+            // If no structured text found, try to extract readable text
+            const readableText = text.replace(/[^\x20-\x7E\s]/g, ' ').replace(/\s+/g, ' ').trim();
+            if (readableText.length > 50) { // Only return if we found substantial text
+                console.log('✅ Fallback extraction found readable text');
+                return readableText;
+            }
+            
+            throw new Error('No readable text found in PDF');
+        } catch (error) {
+            console.error('❌ Fallback PDF extraction failed:', error);
+            throw error;
+        }
     }
 
     async callN8nAPI(cvContent, jobSpecs) {
