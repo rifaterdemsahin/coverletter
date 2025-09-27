@@ -629,7 +629,7 @@ Website: hello.rifaterdemsahin.com
         return `
 You are an expert cover letter writer. Generate a professional, personalized cover letter based on the following information:
 
-CANDIDATE CV:
+CANDIDATE CV (${jobSpecs.applicantName}'s Resume):
 ${cvContent}
 
 JOB APPLICATION DETAILS:
@@ -638,6 +638,8 @@ JOB APPLICATION DETAILS:
 - Job Description: ${jobSpecs.jobDescription}
 - Applicant Name: ${jobSpecs.applicantName}
 - Applicant Email: ${jobSpecs.applicantEmail}
+
+IMPORTANT: All references in the cover letter should relate specifically to ${jobSpecs.applicantName}. Use their name, experience, and qualifications from their CV. Do not use any placeholder names or generic information.
 
 REFERENCE COVER LETTER STRUCTURE:
 Dear Hiring Manager,
