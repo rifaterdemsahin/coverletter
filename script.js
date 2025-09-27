@@ -129,22 +129,24 @@ class CoverLetterGenerator {
     async loadErdemSahinCv() {
         console.log('📄 Loading Erdem Sahin CV...');
         try {
-            // Create a mock file object for Erdem Sahin CV
-            const mockFile = new File([''], 'erdem-sahin-cv_summary_2025_may.pdf', { type: 'application/pdf' });
-            
-            // Use the cached CV data if available, otherwise extract from PDF
-            if (this.cachedCvData) {
-                this.cvFile = mockFile;
-                this.displayFileInfo(mockFile);
-                console.log('✅ Using cached Erdem Sahin CV data');
-            } else {
-                // Simulate loading the actual CV content
-                const cvContent = await this.loadErdemSahinCvContent();
-                this.cachedCvData = cvContent;
-                this.cvFile = mockFile;
-                this.displayFileInfo(mockFile);
-                console.log('✅ Erdem Sahin CV loaded successfully');
+            // Load the actual PDF file
+            const response = await fetch('./erdem-sahin-cv_summary_2025_may.pdf');
+            if (!response.ok) {
+                throw new Error(`Failed to fetch PDF: ${response.status} ${response.statusText}`);
             }
+            
+            const pdfBlob = await response.blob();
+            const pdfFile = new File([pdfBlob], 'erdem-sahin-cv_summary_2025_may.pdf', { type: 'application/pdf' });
+            
+            // Extract text from the PDF
+            const cvContent = await this.extractPDFText(pdfFile);
+            this.cachedCvData = cvContent;
+            this.cvFile = pdfFile;
+            
+            // Display file info and hide upload area
+            this.displayFileInfo(pdfFile);
+            this.uploadArea.style.display = 'none';
+            this.fileInfo.style.display = 'block';
             
             // Auto-fill name and email fields
             this.autoFillErdemSahinInfo();
@@ -152,9 +154,24 @@ class CoverLetterGenerator {
             this.validateForm();
             this.showSuccess('Erdem Sahin CV loaded successfully!');
             
+            console.log('✅ Erdem Sahin CV loaded successfully');
+            
         } catch (error) {
             console.error('❌ Error loading Erdem Sahin CV:', error);
-            this.showError('Failed to load Erdem Sahin CV. Please try again.');
+            // Fallback to mock content if PDF loading fails
+            console.log('🔄 Falling back to mock CV content...');
+            const cvContent = await this.loadErdemSahinCvContent();
+            this.cachedCvData = cvContent;
+            
+            const mockFile = new File([''], 'erdem-sahin-cv_summary_2025_may.pdf', { type: 'application/pdf' });
+            this.cvFile = mockFile;
+            this.displayFileInfo(mockFile);
+            this.uploadArea.style.display = 'none';
+            this.fileInfo.style.display = 'block';
+            
+            this.autoFillErdemSahinInfo();
+            this.validateForm();
+            this.showSuccess('Erdem Sahin CV loaded successfully (using fallback content)!');
         }
     }
 
@@ -250,6 +267,7 @@ Website: hello.rifaterdemsahin.com
         this.cvFile = null;
         this.cvUpload.value = '';
         this.fileInfo.style.display = 'none';
+        this.uploadArea.style.display = 'block';
         this.cachedCvData = null;
         
         // Clear auto-filled fields
@@ -323,66 +341,6 @@ Website: hello.rifaterdemsahin.com
         this.validateForm();
     }
 
-    handleCvSelection(e) {
-        const selectedValue = e.target.value;
-        
-        if (selectedValue === 'erdem-sahin') {
-            // Load the sample Erdem Sahin CV
-            this.loadSampleCv();
-        } else if (selectedValue === 'upload') {
-            // Reset to upload mode
-            this.resetToUploadMode();
-        }
-    }
-
-    loadSampleCv() {
-        // Create a mock file object for the sample CV
-        const sampleCvContent = `
-            Erdem Sahin
-            DevOps Engineer
-            
-            Experience:
-            - 5 years of experience in cloud architecture and DevOps
-            - Expert in Azure WebApps, Kubernetes, Docker
-            - Strong background in CI/CD pipelines
-            - Experience with infrastructure as code
-            - Skilled in monitoring and automation
-            
-            Education:
-            - Bachelor's in Computer Science
-            
-            Skills:
-            - Azure, AWS, Kubernetes, Docker
-            - Terraform, Ansible
-            - Python, Bash scripting
-            - Jenkins, GitLab CI
-            
-            Contact:
-            - Email: erdemsahin@email.com
-            - Phone: +1 (555) 123-4567
-        `;
-        
-        // Create a mock file object
-        const mockFile = new Blob([sampleCvContent], { type: 'text/plain' });
-        mockFile.name = 'erdem-sahin-cv.txt';
-        mockFile.size = sampleCvContent.length;
-        
-        this.cvFile = mockFile;
-        this.displayFileInfo(mockFile);
-        this.validateForm();
-        
-        // Hide upload area and show file info
-        this.uploadArea.style.display = 'none';
-        this.fileInfo.style.display = 'block';
-    }
-
-    resetToUploadMode() {
-        this.cvFile = null;
-        this.cvUpload.value = '';
-        this.fileInfo.style.display = 'none';
-        this.uploadArea.style.display = 'block';
-        this.validateForm();
-    }
 
     validateForm() {
         const formData = new FormData(this.jobSpecsForm);
