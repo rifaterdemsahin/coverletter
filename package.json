@@ -1,6 +1,6 @@
 {
   "name": "ai-cover-letter-generator",
-  "version": "1.0.0",
+  "version": "1.2.0",
   "description": "AI-powered cover letter generator using Gemini 2.5",
   "main": "index.html",
   "scripts": {

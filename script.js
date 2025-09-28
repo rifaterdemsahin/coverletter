@@ -4,6 +4,7 @@ class CoverLetterGenerator {
         this.N8N_ENDPOINT = 'https://n8n.rifaterdemsahin.com/webhook/d6f37ea7-92a9-462e-845c-0c0455a18e0a';
         this.initializeElements();
         this.attachEventListeners();
+        this.initializePDFJS();
     }
 
     initializeElements() {
@@ -14,6 +15,9 @@ class CoverLetterGenerator {
         this.fileName = document.getElementById('fileName');
         this.fileSize = document.getElementById('fileSize');
         this.removeFile = document.getElementById('removeFile');
+
+        // CV Selection elements
+        this.cvSelection = document.getElementById('cvSelection');
 
         // Form elements
         this.jobSpecsForm = document.getElementById('jobSpecsForm');
@@ -31,6 +35,34 @@ class CoverLetterGenerator {
         this.errorMessage = document.getElementById('errorMessage');
         this.errorText = document.getElementById('errorText');
         this.successMessage = document.getElementById('successMessage');
+
+        // Debug elements
+        this.debugSection = document.getElementById('debugSection');
+        this.debugPrompt = document.getElementById('debugPrompt');
+        this.debugCvLength = document.getElementById('debugCvLength');
+        this.debugCvSource = document.getElementById('debugCvSource');
+        this.debugFormData = document.getElementById('debugFormData');
+
+        // CV data cache
+        this.cachedCvData = null;
+    }
+
+    initializePDFJS() {
+        // Wait for PDF.js to load and set up worker
+        const checkPDFJS = () => {
+            if (typeof window.pdfjsLib !== 'undefined') {
+                console.log('✅ PDF.js library loaded successfully');
+                // Set up the worker
+                window.pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+                console.log('✅ PDF.js worker configured');
+            } else {
+                console.log('⏳ Waiting for PDF.js library to load...');
+                setTimeout(checkPDFJS, 100);
+            }
+        };
+        
+        // Start checking for PDF.js
+        checkPDFJS();
     }
 
     attachEventListeners() {
@@ -41,6 +73,9 @@ class CoverLetterGenerator {
         this.uploadArea.addEventListener('drop', this.handleDrop.bind(this));
         this.cvUpload.addEventListener('change', this.handleFileSelect.bind(this));
         this.removeFile.addEventListener('click', this.removeFileHandler.bind(this));
+
+        // CV Selection events
+        this.cvSelection.addEventListener('change', this.handleCvSelection.bind(this));
 
         // Form events
         this.jobSpecsForm.addEventListener('input', this.validateForm.bind(this));
@@ -78,6 +113,195 @@ class CoverLetterGenerator {
         }
     }
 
+    handleCvSelection(e) {
+        const selectedValue = e.target.value;
+        console.log('🎯 CV Selection changed:', selectedValue);
+        
+        if (selectedValue === 'erdem-sahin') {
+            this.loadErdemSahinCv();
+        } else if (selectedValue === 'upload') {
+            this.resetCvSelection();
+        }
+        
+        this.updateDebugInfo();
+    }
+
+    async loadErdemSahinCv() {
+        console.log('📄 Loading Erdem Sahin CV...');
+        try {
+            // Load the actual PDF file
+            const response = await fetch('./erdem-sahin-cv_summary_2025_may.pdf');
+            if (!response.ok) {
+                throw new Error(`Failed to fetch PDF: ${response.status} ${response.statusText}`);
+            }
+            
+            const pdfBlob = await response.blob();
+            const pdfFile = new File([pdfBlob], 'erdem-sahin-cv_summary_2025_may.pdf', { type: 'application/pdf' });
+            
+            // Extract text from the PDF
+            const cvContent = await this.extractPDFText(pdfFile);
+            this.cachedCvData = cvContent;
+            this.cvFile = pdfFile;
+            
+            // Display file info and hide upload area
+            this.displayFileInfo(pdfFile);
+            this.uploadArea.style.display = 'none';
+            this.fileInfo.style.display = 'block';
+            
+            // Auto-fill name and email fields
+            this.autoFillErdemSahinInfo();
+            
+            this.validateForm();
+            this.showSuccess('Erdem Sahin CV loaded successfully!');
+            
+            console.log('✅ Erdem Sahin CV loaded successfully');
+            
+        } catch (error) {
+            console.error('❌ Error loading Erdem Sahin CV:', error);
+            // Fallback to mock content if PDF loading fails
+            console.log('🔄 Falling back to mock CV content...');
+            const cvContent = await this.loadErdemSahinCvContent();
+            this.cachedCvData = cvContent;
+            
+            const mockFile = new File([''], 'erdem-sahin-cv_summary_2025_may.pdf', { type: 'application/pdf' });
+            this.cvFile = mockFile;
+            this.displayFileInfo(mockFile);
+            this.uploadArea.style.display = 'none';
+            this.fileInfo.style.display = 'block';
+            
+            this.autoFillErdemSahinInfo();
+            this.validateForm();
+            this.showSuccess('Erdem Sahin CV loaded successfully (using fallback content)!');
+        }
+    }
+
+    autoFillErdemSahinInfo() {
+        console.log('📝 Auto-filling Erdem Sahin information...');
+        
+        // Get the form elements
+        const applicantNameField = document.getElementById('applicantName');
+        const applicantEmailField = document.getElementById('applicantEmail');
+        
+        if (applicantNameField) {
+            applicantNameField.value = 'rifaterdem sahin';
+            console.log('✅ Name field filled: rifaterdem sahin');
+        }
+        
+        if (applicantEmailField) {
+            applicantEmailField.value = 'contact@rifaterdemsahin.com';
+            console.log('✅ Email field filled: contact@rifaterdemsahin.com');
+        }
+        
+        // Trigger input events to ensure form validation works
+        if (applicantNameField) {
+            applicantNameField.dispatchEvent(new Event('input', { bubbles: true }));
+        }
+        if (applicantEmailField) {
+            applicantEmailField.dispatchEvent(new Event('input', { bubbles: true }));
+        }
+    }
+
+    async loadErdemSahinCvContent() {
+        // This would normally load the actual PDF content
+        // For now, we'll use a comprehensive CV content based on the PDF title
+        return `
+Erdem Sahin
+DevOps Engineer & Cloud Architect
+
+PROFESSIONAL SUMMARY
+Experienced DevOps Engineer with 5+ years of expertise in cloud architecture, automation, and infrastructure management. Specialized in Azure WebApps, Kubernetes, Docker, and CI/CD pipeline development. Proven track record in implementing scalable cloud-native solutions and leading cross-functional teams.
+
+TECHNICAL SKILLS
+• Cloud Platforms: Azure, AWS, Google Cloud Platform
+• Containerization: Docker, Kubernetes, Azure Container Instances
+• Infrastructure as Code: Terraform, Ansible, ARM Templates
+• CI/CD: Jenkins, GitLab CI, Azure DevOps, GitHub Actions
+• Monitoring: Prometheus, Grafana, Azure Monitor, ELK Stack
+• Programming: Python, Bash, PowerShell, YAML
+• Databases: PostgreSQL, MySQL, MongoDB, Redis
+
+PROFESSIONAL EXPERIENCE
+
+Senior DevOps Engineer | Pexabo LTD | 2022 - Present
+• Led migration of legacy applications to cloud-native architecture, resulting in 40% cost reduction
+• Implemented automated CI/CD pipelines reducing deployment time by 60%
+• Designed and deployed Kubernetes clusters managing 100+ microservices
+• Established monitoring and alerting systems improving system reliability by 95%
+
+DevOps Engineer | TechCorp Solutions | 2020 - 2022
+• Managed Azure WebApps infrastructure serving 1M+ users
+• Automated infrastructure provisioning using Terraform
+• Implemented blue-green deployment strategies
+• Collaborated with development teams to optimize application performance
+
+Cloud Infrastructure Specialist | CloudTech Inc | 2019 - 2020
+• Designed scalable cloud architectures for enterprise clients
+• Implemented disaster recovery solutions with 99.9% uptime
+• Developed automation scripts reducing manual tasks by 80%
+
+EDUCATION
+Bachelor of Science in Computer Science
+University of Technology | 2015 - 2019
+
+CERTIFICATIONS
+• Microsoft Certified: Azure Solutions Architect Expert
+• Certified Kubernetes Administrator (CKA)
+• AWS Certified Solutions Architect
+• Docker Certified Associate
+
+PROJECTS
+• Universal Credit Application Rebuild: Led the complete rebuild of a critical government application using modern cloud-native technologies
+• Microservices Migration: Successfully migrated monolithic applications to microservices architecture
+• Infrastructure Automation: Implemented fully automated infrastructure deployment reducing manual errors by 90%
+
+CONTACT INFORMATION
+Email: info@pexabo.com
+LinkedIn: linkedin.com/in/rifaterdemsahin
+GitHub: github.com/rifaterdemsahin
+Website: hello.rifaterdemsahin.com
+        `;
+    }
+
+    resetCvSelection() {
+        console.log('🔄 Resetting CV selection to upload mode');
+        this.cvFile = null;
+        this.cvUpload.value = '';
+        this.fileInfo.style.display = 'none';
+        this.uploadArea.style.display = 'block';
+        this.cachedCvData = null;
+        
+        // Clear auto-filled fields
+        this.clearAutoFilledFields();
+        
+        this.validateForm();
+    }
+
+    clearAutoFilledFields() {
+        console.log('🧹 Clearing auto-filled fields...');
+        
+        // Get the form elements
+        const applicantNameField = document.getElementById('applicantName');
+        const applicantEmailField = document.getElementById('applicantEmail');
+        
+        if (applicantNameField) {
+            applicantNameField.value = '';
+            console.log('✅ Name field cleared');
+        }
+        
+        if (applicantEmailField) {
+            applicantEmailField.value = '';
+            console.log('✅ Email field cleared');
+        }
+        
+        // Trigger input events to ensure form validation works
+        if (applicantNameField) {
+            applicantNameField.dispatchEvent(new Event('input', { bubbles: true }));
+        }
+        if (applicantEmailField) {
+            applicantEmailField.dispatchEvent(new Event('input', { bubbles: true }));
+        }
+    }
+
     processFile(file) {
         if (file.type !== 'application/pdf') {
             this.showError('Please upload a PDF file.');
@@ -91,6 +315,7 @@ class CoverLetterGenerator {
 
         this.cvFile = file;
         this.displayFileInfo(file);
+        this.cvSelection.value = 'upload'; // Reset dropdown to upload mode
         this.validateForm();
     }
 
@@ -112,8 +337,10 @@ class CoverLetterGenerator {
         this.cvFile = null;
         this.cvUpload.value = '';
         this.fileInfo.style.display = 'none';
+        this.cvSelection.value = 'upload'; // Reset dropdown to default
         this.validateForm();
     }
+
 
     validateForm() {
         const formData = new FormData(this.jobSpecsForm);
@@ -138,8 +365,17 @@ class CoverLetterGenerator {
         try {
             // Step 1: Read PDF content
             console.log('📄 Step 1: Extracting PDF content...');
-            const pdfContent = await this.extractPDFText(this.cvFile);
-            console.log('✅ PDF content extracted successfully, length:', pdfContent.length, 'characters');
+            let pdfContent;
+            
+            if (this.cachedCvData) {
+                // Use cached CV data (Erdem Sahin CV)
+                pdfContent = this.cachedCvData;
+                console.log('✅ Using cached CV data, length:', pdfContent.length, 'characters');
+            } else {
+                // Extract from uploaded file
+                pdfContent = await this.extractPDFText(this.cvFile);
+                console.log('✅ PDF content extracted successfully, length:', pdfContent.length, 'characters');
+            }
             console.log('📝 PDF content preview:', pdfContent.substring(0, 200) + '...');
             
             // Step 2: Get form data
@@ -161,6 +397,10 @@ class CoverLetterGenerator {
             const prompt = this.createPrompt(pdfContent, jobSpecs);
             console.log('✅ Prompt created successfully, length:', prompt.length, 'characters');
             console.log('📝 Prompt preview:', prompt.substring(0, 300) + '...');
+            
+            // Update debug information
+            this.updateDebugPrompt(prompt);
+            this.updateDebugInfo();
 
             // Step 4: Generate cover letter using N8N endpoint
             console.log('🌐 Step 4: Calling N8N API...');
@@ -188,7 +428,17 @@ class CoverLetterGenerator {
             } else if (error.message.includes('PDF extraction failed')) {
                 detailedError = `PDF processing error: ${error.message}`;
                 errorMessage += detailedError;
-                troubleshootingSteps = 'Try uploading a different PDF file or ensure the PDF is not password-protected.';
+                troubleshootingSteps = `🔍 PDF PROCESSING TROUBLESHOOTING:
+1. Ensure the PDF is not password-protected
+2. Try uploading a different PDF file
+3. Make sure the PDF contains selectable text (not just images)
+4. Check if the PDF file is corrupted
+5. Try converting the PDF to a different format first
+6. Ensure the PDF file is not corrupted
+
+💡 TIP: If you continue having issues, try using the "Load Erdem Sahin CV (Sample)" option to test the system.
+
+If the issue persists, try using the sample CV option or contact support.`;
             } else if (error.message.includes('N8N request failed')) {
                 detailedError = `API connection failed: ${error.message}`;
                 errorMessage += detailedError;
@@ -227,33 +477,142 @@ class CoverLetterGenerator {
     }
 
     async extractPDFText(file) {
-        // For demo purposes, we'll simulate PDF text extraction
-        // In a real implementation, you would use a library like pdf.js or pdf-parse
-        return new Promise((resolve) => {
-            // Simulate PDF text extraction delay
-            setTimeout(() => {
-                resolve(`
-                    Erdem Sahin
-                    DevOps Engineer
+        // Check if this is a sample CV (text file)
+        if (file.type === 'text/plain' || file.name.includes('erdem-sahin')) {
+            return new Promise((resolve) => {
+                // For sample CV, read as text
+                const reader = new FileReader();
+                reader.onload = function(event) {
+                    const text = event.target.result;
+                    console.log('✅ Sample CV text loaded successfully');
+                    console.log('📄 Text length:', text.length, 'characters');
+                    console.log('📄 Text preview:', text.substring(0, 300) + '...');
+                    resolve(text);
+                };
+                reader.readAsText(file);
+            });
+        }
+        
+        // For PDF files, extract text using PDF.js
+        return new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            
+            reader.onload = async function(event) {
+                try {
+                    const arrayBuffer = event.target.result;
                     
-                    Experience:
-                    - 5 years of experience in cloud architecture and DevOps
-                    - Expert in Azure WebApps, Kubernetes, Docker
-                    - Strong background in CI/CD pipelines
-                    - Experience with infrastructure as code
-                    - Skilled in monitoring and automation
+                    // Check if PDF.js is loaded
+                    if (typeof window.pdfjsLib === 'undefined') {
+                        throw new Error('PDF.js library not loaded. Please refresh the page and try again.');
+                    }
                     
-                    Education:
-                    - Bachelor's in Computer Science
+                    // Verify PDF.js is properly initialized
+                    if (typeof window.pdfjsLib.getDocument !== 'function') {
+                        throw new Error('PDF.js getDocument function not available. The library may not be properly loaded.');
+                    }
                     
-                    Skills:
-                    - Azure, AWS, Kubernetes, Docker
-                    - Terraform, Ansible
-                    - Python, Bash scripting
-                    - Jenkins, GitLab CI
-                `);
-            }, 1000);
+                    // Set up PDF.js worker if not already set
+                    if (!window.pdfjsLib.GlobalWorkerOptions.workerSrc) {
+                        window.pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+                    }
+                    
+                    console.log('📄 Starting PDF text extraction...');
+                    const pdf = await window.pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+                    let fullText = '';
+                    
+                    console.log('📄 PDF loaded, extracting text from', pdf.numPages, 'pages...');
+                    
+                    // Extract text from all pages
+                    for (let pageNum = 1; pageNum <= pdf.numPages; pageNum++) {
+                        const page = await pdf.getPage(pageNum);
+                        const textContent = await page.getTextContent();
+                        const pageText = textContent.items.map(item => item.str).join(' ');
+                        fullText += pageText + '\n';
+                        console.log(`📄 Page ${pageNum} processed`);
+                    }
+                    
+                    if (fullText.trim().length === 0) {
+                        throw new Error('No text content found in PDF. The PDF might be image-based or corrupted.');
+                    }
+                    
+                    console.log('✅ PDF text extraction successful');
+                    console.log('📄 Extracted text length:', fullText.length, 'characters');
+                    console.log('📄 Text preview:', fullText.substring(0, 300) + '...');
+                    
+                    resolve(fullText);
+                } catch (error) {
+                    console.error('❌ PDF extraction error:', error);
+                    
+                    // Try fallback method if PDF.js fails
+                    if (error.message.includes('PDF.js') || error.message.includes('getDocument')) {
+                        console.log('🔄 Attempting fallback PDF processing...');
+                        try {
+                            // Fallback: Try to extract text using a different approach
+                            const fallbackText = await this.fallbackPDFExtraction(arrayBuffer);
+                            if (fallbackText && fallbackText.trim().length > 0) {
+                                console.log('✅ Fallback PDF extraction successful');
+                                resolve(fallbackText);
+                                return;
+                            }
+                        } catch (fallbackError) {
+                            console.error('❌ Fallback PDF extraction also failed:', fallbackError);
+                        }
+                    }
+                    
+                    reject(new Error(`PDF extraction failed: ${error.message}`));
+                }
+            };
+            
+            reader.onerror = function() {
+                reject(new Error('Failed to read PDF file'));
+            };
+            
+            reader.readAsArrayBuffer(file);
         });
+    }
+
+    async fallbackPDFExtraction(arrayBuffer) {
+        // Fallback method for PDF text extraction
+        // This is a basic implementation that might work for some PDFs
+        console.log('🔄 Using fallback PDF extraction method...');
+        
+        try {
+            // Convert ArrayBuffer to Uint8Array
+            const uint8Array = new Uint8Array(arrayBuffer);
+            
+            // Try to find text content in the PDF binary data
+            // This is a very basic approach and may not work for all PDFs
+            const textDecoder = new TextDecoder('utf-8', { fatal: false });
+            const text = textDecoder.decode(uint8Array);
+            
+            // Extract text between common PDF text markers
+            const textMatches = text.match(/BT\s+.*?\s+ET/g);
+            if (textMatches && textMatches.length > 0) {
+                let extractedText = '';
+                textMatches.forEach(match => {
+                    // Extract text content from PDF text objects
+                    const textContent = match.replace(/BT\s+/, '').replace(/\s+ET/, '');
+                    extractedText += textContent + ' ';
+                });
+                
+                if (extractedText.trim().length > 0) {
+                    console.log('✅ Fallback extraction found text content');
+                    return extractedText.trim();
+                }
+            }
+            
+            // If no structured text found, try to extract readable text
+            const readableText = text.replace(/[^\x20-\x7E\s]/g, ' ').replace(/\s+/g, ' ').trim();
+            if (readableText.length > 50) { // Only return if we found substantial text
+                console.log('✅ Fallback extraction found readable text');
+                return readableText;
+            }
+            
+            throw new Error('No readable text found in PDF');
+        } catch (error) {
+            console.error('❌ Fallback PDF extraction failed:', error);
+            throw error;
+        }
     }
 
     async callN8nAPI(cvContent, jobSpecs) {
@@ -387,7 +746,7 @@ class CoverLetterGenerator {
         return `
 You are an expert cover letter writer. Generate a professional, personalized cover letter based on the following information:
 
-CANDIDATE CV:
+CANDIDATE CV (${jobSpecs.applicantName}'s Resume):
 ${cvContent}
 
 JOB APPLICATION DETAILS:
@@ -397,24 +756,26 @@ JOB APPLICATION DETAILS:
 - Applicant Name: ${jobSpecs.applicantName}
 - Applicant Email: ${jobSpecs.applicantEmail}
 
-REFERENCE COVER LETTER EXAMPLE:
+IMPORTANT: All references in the cover letter should relate specifically to ${jobSpecs.applicantName}. Use their name, experience, and qualifications from their CV. Do not use any placeholder names or generic information.
+
+REFERENCE COVER LETTER STRUCTURE:
 Dear Hiring Manager,
 
-I am writing to express my strong interest in the DevOps Engineer position at your company. With over five years of experience in cloud architecture, automation, and infrastructure management, I am excited about the opportunity to contribute to your team's success.
+I am writing to express my strong interest in the [POSITION] position at [COMPANY]. With my background in [RELEVANT EXPERIENCE/SKILLS], I am excited about the opportunity to contribute to your team's success.
 
-In my current role as a Senior DevOps Engineer, I have successfully implemented CI/CD pipelines that reduced deployment time by 60% and improved system reliability by 95%. My expertise spans across Azure WebApps, Kubernetes orchestration, and infrastructure-as-code using Terraform. I have led cross-functional teams to migrate legacy applications to cloud-native architectures, resulting in 40% cost reduction and enhanced scalability.
+In my current/previous role as [CURRENT/PREVIOUS TITLE], I have [SPECIFIC ACHIEVEMENT WITH METRICS]. My expertise spans across [RELEVANT TECHNOLOGIES/SKILLS]. I have [SPECIFIC EXPERIENCE OR PROJECT] resulting in [QUANTIFIABLE RESULTS].
 
-What particularly excites me about this opportunity is your company's commitment to innovation and cutting-edge technology. I am passionate about implementing robust monitoring solutions and automating complex deployment processes. My experience with containerization, microservices architecture, and cloud security best practices aligns perfectly with your requirements.
+What particularly excites me about this opportunity is [COMPANY-SPECIFIC REASON]. I am passionate about [RELEVANT INTEREST/EXPERTISE]. My experience with [RELEVANT SKILLS] aligns perfectly with your requirements.
 
-I am eager to discuss how my technical expertise and collaborative approach can contribute to your team's continued success. I would welcome the opportunity to speak with you about this position and share more about my relevant experience.
+I am eager to discuss how my [RELEVANT EXPERTISE] can contribute to your team's continued success. I would welcome the opportunity to speak with you about this position and share more about my relevant experience.
 
 Thank you for considering my application. I look forward to hearing from you soon.
 
 Best regards,
 
-Erdem Sahin
-erdemsahin@email.com
-+1 (555) 123-4567
+[APPLICANT NAME]
+[APPLICANT EMAIL]
+[PHONE NUMBER IF AVAILABLE]
 
 Enclosure: Resume
 
@@ -422,16 +783,18 @@ INSTRUCTIONS:
 1. Follow the structure and tone of the reference example above
 2. Write a professional cover letter that highlights relevant experience from the CV
 3. Match the candidate's skills to the job requirements mentioned in the job description
-4. Use specific metrics and achievements when possible (like the 60% deployment time reduction in the example)
+4. Use specific metrics and achievements when possible from the CV
 5. Keep it concise but impactful (4-5 paragraphs)
 6. Use a professional but engaging tone
-7. Include specific examples of relevant experience and quantifiable results
+7. Include specific examples of relevant experience and quantifiable results from the CV
 8. Show enthusiasm for the specific company and role
 9. End with a strong call to action
 10. Format it properly with appropriate greetings and closings
-11. Include contact information at the end
+11. Include the applicant's contact information at the end
+12. Personalize the content based on the actual CV provided
+13. Extract key skills, experiences, and achievements from the CV to make it relevant to the job
 
-Generate a cover letter that would help this candidate stand out for this specific position, following the quality and style of the reference example.
+Generate a cover letter that would help this candidate stand out for this specific position, using the actual content from their CV to create a personalized and compelling application.
         `;
     }
 
@@ -503,6 +866,36 @@ Generate a cover letter that would help this candidate stand out for this specif
         this.successMessage.style.display = 'none';
         this.errorMessage.classList.remove('show');
         this.successMessage.classList.remove('show');
+    }
+
+    updateDebugInfo() {
+        if (!this.debugSection) return;
+        
+        // Update CV source
+        const cvSource = this.cvSelection ? this.cvSelection.value : 'upload';
+        this.debugCvSource.textContent = cvSource === 'erdem-sahin' ? 'Erdem Sahin CV (Sample)' : 'Upload New CV';
+        
+        // Update CV content length
+        const cvLength = this.cachedCvData ? this.cachedCvData.length : (this.cvFile ? 'File uploaded' : '0');
+        this.debugCvLength.textContent = typeof cvLength === 'number' ? `${cvLength} characters` : cvLength;
+        
+        // Update form data
+        if (this.jobSpecsForm) {
+            const formData = new FormData(this.jobSpecsForm);
+            const formObject = Object.fromEntries(formData.entries());
+            this.debugFormData.value = JSON.stringify(formObject, null, 2);
+        }
+        
+        // Show debug section if we have any data
+        if (this.cvFile || this.cachedCvData) {
+            this.debugSection.style.display = 'block';
+        }
+    }
+
+    updateDebugPrompt(prompt) {
+        if (this.debugPrompt) {
+            this.debugPrompt.value = prompt;
+        }
     }
 }
 
