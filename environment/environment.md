@@ -10,14 +10,13 @@ This document outlines the environment setup, configuration requirements, and de
 
 #### System Requirements
 - **Operating System**: macOS 10.15+, Windows 10+, or Linux (Ubuntu 18.04+)
-- **Node.js**: Version 14.0.0 or higher
 - **Python**: Version 3.7+ (for local server)
 - **Modern Web Browser**: Chrome 60+, Firefox 55+, Safari 12+, Edge 79+
 
 #### Development Tools
 - **Code Editor**: VS Code, Cursor, or any modern IDE
 - **Git**: Version control system
-- **Local Web Server**: Python http.server, Node.js serve, or any static file server
+- **Local Web Server**: Python http.server or any static file server
 
 ### Local Development Setup
 
@@ -27,8 +26,7 @@ This document outlines the environment setup, configuration requirements, and de
 git clone <repository-url>
 cd ai-cover-letter-generator
 
-# Install dependencies (if using Node.js server)
-npm install
+# No additional dependencies required for Python server
 ```
 
 #### 2. Local Server Options
@@ -41,14 +39,10 @@ python -m http.server 8000
 # Access application at http://localhost:8000
 ```
 
-**Option B: Node.js Serve**
+**Option B: Alternative Static Server**
 ```bash
-# Install serve globally
-npm install -g serve
-
-# Start server on port 8000
-npx serve . -p 8000
-
+# Using any static file server of your choice
+# Examples: Apache, Nginx, or any other static file server
 # Access application at http://localhost:8000
 ```
 

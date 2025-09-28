@@ -369,11 +369,12 @@ Website: hello.rifaterdemsahin.com
             
             if (this.cachedCvData) {
                 // Use cached CV data (Erdem Sahin CV)
-                pdfContent = this.cachedCvData;
+                pdfContent = this.sanitizeText(this.cachedCvData);
                 console.log('✅ Using cached CV data, length:', pdfContent.length, 'characters');
             } else {
                 // Extract from uploaded file
-                pdfContent = await this.extractPDFText(this.cvFile);
+                const extractedContent = await this.extractPDFText(this.cvFile);
+                pdfContent = this.sanitizeText(extractedContent);
                 console.log('✅ PDF content extracted successfully, length:', pdfContent.length, 'characters');
             }
             console.log('📝 PDF content preview:', pdfContent.substring(0, 200) + '...');
@@ -395,11 +396,12 @@ Website: hello.rifaterdemsahin.com
             // Step 3: Create prompt
             console.log('🎯 Step 3: Creating AI prompt...');
             const prompt = this.createPrompt(pdfContent, jobSpecs);
-            console.log('✅ Prompt created successfully, length:', prompt.length, 'characters');
-            console.log('📝 Prompt preview:', prompt.substring(0, 300) + '...');
+            const sanitizedPrompt = this.sanitizeText(prompt);
+            console.log('✅ Prompt created successfully, length:', sanitizedPrompt.length, 'characters');
+            console.log('📝 Prompt preview:', sanitizedPrompt.substring(0, 300) + '...');
             
             // Update debug information
-            this.updateDebugPrompt(prompt);
+            this.updateDebugPrompt(sanitizedPrompt);
             this.updateDebugInfo();
 
             // Step 4: Generate cover letter using N8N endpoint
@@ -480,7 +482,7 @@ If the issue persists, try using the sample CV option or contact support.`;
         // Check if this is a sample CV (text file)
         if (file.type === 'text/plain' || file.name.includes('erdem-sahin')) {
             return new Promise((resolve) => {
-                // For sample CV, read as text
+                // For sample CV, read as text with proper encoding
                 const reader = new FileReader();
                 reader.onload = function(event) {
                     const text = event.target.result;
@@ -489,7 +491,8 @@ If the issue persists, try using the sample CV option or contact support.`;
                     console.log('📄 Text preview:', text.substring(0, 300) + '...');
                     resolve(text);
                 };
-                reader.readAsText(file);
+                // Specify UTF-8 encoding to prevent character corruption
+                reader.readAsText(file, 'UTF-8');
             });
         }
         
@@ -526,7 +529,12 @@ If the issue persists, try using the sample CV option or contact support.`;
                     for (let pageNum = 1; pageNum <= pdf.numPages; pageNum++) {
                         const page = await pdf.getPage(pageNum);
                         const textContent = await page.getTextContent();
-                        const pageText = textContent.items.map(item => item.str).join(' ');
+                        // Properly handle text extraction with correct encoding
+                        const pageText = textContent.items
+                            .filter(item => item.str && typeof item.str === 'string')
+                            .map(item => item.str.trim())
+                            .filter(text => text.length > 0)
+                            .join(' ');
                         fullText += pageText + '\n';
                         console.log(`📄 Page ${pageNum} processed`);
                     }
@@ -580,32 +588,52 @@ If the issue persists, try using the sample CV option or contact support.`;
             // Convert ArrayBuffer to Uint8Array
             const uint8Array = new Uint8Array(arrayBuffer);
             
-            // Try to find text content in the PDF binary data
-            // This is a very basic approach and may not work for all PDFs
-            const textDecoder = new TextDecoder('utf-8', { fatal: false });
-            const text = textDecoder.decode(uint8Array);
+            // Try multiple encoding approaches to handle different PDF encodings
+            const encodings = ['utf-8', 'latin1', 'iso-8859-1'];
+            let bestText = '';
+            let bestLength = 0;
             
-            // Extract text between common PDF text markers
-            const textMatches = text.match(/BT\s+.*?\s+ET/g);
-            if (textMatches && textMatches.length > 0) {
-                let extractedText = '';
-                textMatches.forEach(match => {
-                    // Extract text content from PDF text objects
-                    const textContent = match.replace(/BT\s+/, '').replace(/\s+ET/, '');
-                    extractedText += textContent + ' ';
-                });
-                
-                if (extractedText.trim().length > 0) {
-                    console.log('✅ Fallback extraction found text content');
-                    return extractedText.trim();
+            for (const encoding of encodings) {
+                try {
+                    const textDecoder = new TextDecoder(encoding, { fatal: false });
+                    const text = textDecoder.decode(uint8Array);
+                    
+                    // Extract text between common PDF text markers
+                    const textMatches = text.match(/BT\s+.*?\s+ET/g);
+                    if (textMatches && textMatches.length > 0) {
+                        let extractedText = '';
+                        textMatches.forEach(match => {
+                            // Extract text content from PDF text objects
+                            const textContent = match.replace(/BT\s+/, '').replace(/\s+ET/, '');
+                            extractedText += textContent + ' ';
+                        });
+                        
+                        if (extractedText.trim().length > bestLength) {
+                            bestText = extractedText.trim();
+                            bestLength = extractedText.trim().length;
+                        }
+                    }
+                    
+                    // If no structured text found, try to extract readable text
+                    // Keep more characters than just ASCII (allow Unicode printable characters)
+                    const readableText = text
+                        .replace(/[^\p{L}\p{N}\p{P}\p{S}\p{Z}]/gu, ' ') // Keep Unicode letters, numbers, punctuation, symbols, spaces
+                        .replace(/\s+/g, ' ')
+                        .trim();
+                        
+                    if (readableText.length > bestLength) {
+                        bestText = readableText;
+                        bestLength = readableText.length;
+                    }
+                } catch (encodingError) {
+                    console.log(`⚠️ Encoding ${encoding} failed:`, encodingError.message);
+                    continue;
                 }
             }
             
-            // If no structured text found, try to extract readable text
-            const readableText = text.replace(/[^\x20-\x7E\s]/g, ' ').replace(/\s+/g, ' ').trim();
-            if (readableText.length > 50) { // Only return if we found substantial text
-                console.log('✅ Fallback extraction found readable text');
-                return readableText;
+            if (bestLength > 50) { // Only return if we found substantial text
+                console.log('✅ Fallback extraction found text content with', bestLength, 'characters');
+                return bestText;
             }
             
             throw new Error('No readable text found in PDF');
@@ -613,6 +641,32 @@ If the issue persists, try using the sample CV option or contact support.`;
             console.error('❌ Fallback PDF extraction failed:', error);
             throw error;
         }
+    }
+
+    sanitizeText(text) {
+        // Clean and sanitize text to prevent character corruption
+        if (!text || typeof text !== 'string') {
+            return '';
+        }
+        
+        // Remove null bytes and other control characters that can cause issues
+        let sanitized = text
+            .replace(/\0/g, '') // Remove null bytes
+            .replace(/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]/g, '') // Remove control characters except \t, \n, \r
+            .replace(/\uFEFF/g, '') // Remove BOM (Byte Order Mark)
+            .trim();
+        
+        // Normalize Unicode characters
+        try {
+            sanitized = sanitized.normalize('NFC'); // Canonical decomposition followed by canonical composition
+        } catch (error) {
+            console.warn('⚠️ Unicode normalization failed:', error.message);
+        }
+        
+        // Replace multiple whitespace with single space
+        sanitized = sanitized.replace(/\s+/g, ' ');
+        
+        return sanitized;
     }
 
     async callN8nAPI(cvContent, jobSpecs) {
@@ -624,9 +678,9 @@ If the issue persists, try using the sample CV option or contact support.`;
         console.log('📋 Job Specs:', jobSpecs);
 
         const requestData = {
-            cvContent: cvContent,
+            cvContent: this.sanitizeText(cvContent),
             jobSpecs: jobSpecs,
-            prompt: this.createPrompt(cvContent, jobSpecs)
+            prompt: this.sanitizeText(this.createPrompt(cvContent, jobSpecs))
         };
         
         console.log('📦 Request Data Size:', JSON.stringify(requestData).length, 'bytes');

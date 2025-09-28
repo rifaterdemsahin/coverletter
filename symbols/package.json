@@ -6,8 +6,7 @@
   "scripts": {
     "start": "python -m http.server 8000",
     "dev": "python -m http.server 8000",
-    "build": "echo 'No build step required for static files'",
-    "serve": "npx serve . -p 8000"
+    "build": "echo 'No build step required for static files'"
   },
   "keywords": [
     "cover-letter",
@@ -19,13 +18,7 @@
   ],
   "author": "Rifat Erdem Sahin",
   "license": "MIT",
-  "devDependencies": {
-    "serve": "^14.2.1"
-  },
   "dependencies": {},
-  "engines": {
-    "node": ">=14.0.0"
-  },
   "repository": {
     "type": "git",
     "url": "https://github.com/rifaterdemsahin/coverletter.git"

@@ -44,7 +44,7 @@ A modern, AI-powered web application that generates personalized cover letters u
 
 - Modern web browser with JavaScript enabled
 - N8N backend endpoint configured (for production use)
-- Local web server (Python, Node.js, or any static server)
+- Local web server (Python or any static server)
 
 ### Installation
 
@@ -61,18 +61,12 @@ A modern, AI-powered web application that generates personalized cover letters u
 
 3. **Start a Local Server**
    
-   **Option 1: Using Python (Recommended)**
+   **Using Python (Recommended)**
    ```bash
    python -m http.server 8000
    ```
    
-   **Option 2: Using Node.js**
-   ```bash
-   npm install
-   npm run serve
-   ```
-   
-   **Option 3: Using any static file server**
+   **Alternative: Using any static file server**
    - Serve the files from any static file server
    - Ensure CORS is properly configured for API calls
 
@@ -157,7 +151,7 @@ The application integrates with a secure N8N backend that handles Google's Gemin
 - Currently uses simulated PDF text extraction
 - To implement real PDF parsing, integrate libraries like:
   - `pdf.js` for client-side processing
-  - `pdf-parse` for Node.js backend
+  - PDF parsing handled by PDF.js in browser
   - Server-side PDF processing with Python libraries
 
 ## Security Considerations

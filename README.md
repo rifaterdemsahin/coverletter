@@ -34,7 +34,7 @@ A modern, AI-powered web application that generates personalized cover letters u
 ### Prerequisites
 
 - Modern web browser with JavaScript enabled
-- Local web server (Python, Node.js, or any static server)
+- Local web server (Python or any static server)
 - N8N backend endpoint configured (for production use)
 - OpenRouter API account with Gemini 2.5 Flash access
 
@@ -58,15 +58,9 @@ A modern, AI-powered web application that generates personalized cover letters u
 
 4. **Start a Local Server**
    
-   **Option 1: Using Python (Recommended)**
+   **Using Python (Recommended)**
    ```bash
    python -m http.server 8000
-   ```
-   
-   **Option 2: Using Node.js**
-   ```bash
-   npm install
-   npm run serve
    ```
 
 5. **Open in Browser**
