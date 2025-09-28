@@ -5,6 +5,7 @@ class CoverLetterGenerator {
         this.initializeElements();
         this.attachEventListeners();
         this.initializePDFJS();
+        this.validateForm(); // Initial validation
     }
 
     initializeElements() {
@@ -343,10 +344,23 @@ Website: hello.rifaterdemsahin.com
 
 
     validateForm() {
+        // Check required form fields
+        const requiredFields = ['companyName', 'jobTitle', 'jobDescription', 'applicantName', 'applicantEmail'];
         const formData = new FormData(this.jobSpecsForm);
-        const isFormValid = Array.from(formData.entries()).every(([key, value]) => value.trim() !== '');
+        
+        const isFormValid = requiredFields.every(fieldName => {
+            const value = formData.get(fieldName);
+            return value && value.trim() !== '';
+        });
         
         this.generateBtn.disabled = !isFormValid || !this.cvFile;
+        
+        console.log('🔍 Form validation:', {
+            isFormValid,
+            hasCvFile: !!this.cvFile,
+            buttonDisabled: this.generateBtn.disabled,
+            formData: Object.fromEntries(formData.entries())
+        });
     }
 
     async generateCoverLetter() {
