@@ -1,0 +1,297 @@
+{
+  "testConfiguration": {
+    "name": "AI Cover Letter Generator Test Data",
+    "version": "1.0.0",
+    "description": "Test data and configurations for the AI Cover Letter Generator application",
+    "lastUpdated": "2025-01-27"
+  },
+  "sampleFiles": {
+    "cvSamples": {
+      "validPDF": {
+        "name": "valid-cv.pdf",
+        "type": "application/pdf",
+        "size": 1024000,
+        "description": "Valid PDF CV with standard text content"
+      },
+      "largePDF": {
+        "name": "large-cv.pdf", 
+        "type": "application/pdf",
+        "size": 15728640,
+        "description": "Large PDF file exceeding size limit"
+      },
+      "invalidType": {
+        "name": "cv.txt",
+        "type": "text/plain",
+        "size": 512000,
+        "description": "Invalid file type (text instead of PDF)"
+      },
+      "emptyPDF": {
+        "name": "empty-cv.pdf",
+        "type": "application/pdf", 
+        "size": 0,
+        "description": "Empty PDF file"
+      },
+      "corruptedPDF": {
+        "name": "corrupted-cv.pdf",
+        "type": "application/pdf",
+        "size": 512000,
+        "description": "Corrupted PDF file for error testing"
+      }
+    },
+    "jobSpecifications": {
+      "validJobSpec": {
+        "companyName": "Google",
+        "jobTitle": "Senior Software Engineer",
+        "jobDescription": "We are looking for a talented Senior Software Engineer to join our Google Cloud team. The ideal candidate will have extensive experience with cloud platforms, microservices architecture, and modern development practices. You will work on cutting-edge projects that serve millions of users worldwide and contribute to Google's mission of organizing the world's information.",
+        "applicantName": "John Doe",
+        "applicantEmail": "john.doe@example.com"
+      },
+      "invalidJobSpec": {
+        "companyName": "",
+        "jobTitle": "",
+        "jobDescription": "",
+        "applicantName": "",
+        "applicantEmail": "invalid-email"
+      },
+      "edgeCaseJobSpec": {
+        "companyName": "Very Long Company Name That Exceeds Normal Length Limits",
+        "jobTitle": "Senior Software Engineer",
+        "jobDescription": "This is a very long job description that contains a lot of text and might test the application's ability to handle large amounts of input data. It includes multiple paragraphs and detailed requirements that could potentially cause issues with text processing or API payload limits.",
+        "applicantName": "Test User",
+        "applicantEmail": "test@example.com"
+      },
+      "specialCharactersJobSpec": {
+        "companyName": "Company & Associates (Pvt.) Ltd.",
+        "jobTitle": "Software Engineer - Full Stack",
+        "jobDescription": "We need a developer with experience in C#, .NET, React, and SQL Server. Must have 3+ years of experience with API development, microservices, and cloud platforms (AWS/Azure). Knowledge of Docker, Kubernetes, and CI/CD pipelines is preferred.",
+        "applicantName": "José María García-López",
+        "applicantEmail": "jose.garcia@example.com"
+      }
+    }
+  },
+  "mockResponses": {
+    "successfulGeneration": {
+      "success": true,
+      "coverLetter": "Dear Hiring Manager,\n\nI am writing to express my strong interest in the Senior Software Engineer position at Google. With my extensive background in cloud platforms and microservices architecture, I am excited about the opportunity to contribute to your Google Cloud team's success.\n\nIn my current role as Senior Software Engineer, I have led the development of scalable cloud-native applications serving over 1 million users. My expertise spans across modern cloud technologies including Google Cloud Platform, AWS, and Azure. I have implemented automated CI/CD pipelines that reduced deployment time by 60% and established monitoring systems that improved system reliability by 95%.\n\nWhat particularly excites me about this opportunity is Google's commitment to innovation and cutting-edge technology. I am passionate about building scalable applications that can handle millions of users and contribute to organizing the world's information. My experience with microservices architecture and cloud platforms aligns perfectly with your requirements.\n\nI am eager to discuss how my expertise in cloud engineering can contribute to your team's continued success. I would welcome the opportunity to speak with you about this position and share more about my relevant experience.\n\nThank you for considering my application. I look forward to hearing from you soon.\n\nBest regards,\n\nJohn Doe\njohn.doe@example.com\n[Your Phone Number]\n\nEnclosure: Resume"
+    },
+    "apiError": {
+      "success": false,
+      "error": "API rate limit exceeded. Please try again later."
+    },
+    "networkError": {
+      "success": false,
+      "error": "Network error: Failed to fetch"
+    },
+    "timeoutError": {
+      "success": false,
+      "error": "Request timeout. Please check your connection and try again."
+    }
+  },
+  "testScenarios": {
+    "happyPath": {
+      "name": "Happy Path - Complete Success Flow",
+      "steps": [
+        "Load application",
+        "Select sample CV or upload valid PDF",
+        "Fill in valid job specifications",
+        "Click generate cover letter",
+        "Verify successful generation",
+        "Copy/download generated cover letter"
+      ],
+      "expectedResult": "Cover letter generated successfully"
+    },
+    "fileUploadError": {
+      "name": "File Upload Error Handling",
+      "steps": [
+        "Load application",
+        "Upload invalid file type",
+        "Verify error message displayed",
+        "Upload file exceeding size limit",
+        "Verify size limit error message"
+      ],
+      "expectedResult": "Appropriate error messages for invalid uploads"
+    },
+    "formValidationError": {
+      "name": "Form Validation Error Handling", 
+      "steps": [
+        "Load application",
+        "Leave required fields empty",
+        "Click generate button",
+        "Verify button remains disabled",
+        "Fill in invalid email format",
+        "Verify email validation error"
+      ],
+      "expectedResult": "Form validation prevents submission with invalid data"
+    },
+    "apiErrorHandling": {
+      "name": "API Error Handling",
+      "steps": [
+        "Load application with valid data",
+        "Simulate API failure",
+        "Verify error message displayed",
+        "Verify troubleshooting information provided",
+        "Test retry functionality"
+      ],
+      "expectedResult": "Graceful error handling with helpful user guidance"
+    },
+    "networkErrorHandling": {
+      "name": "Network Error Handling",
+      "steps": [
+        "Load application",
+        "Disconnect network connection",
+        "Attempt to generate cover letter",
+        "Verify network error message",
+        "Verify connectivity troubleshooting steps"
+      ],
+      "expectedResult": "Network error handling with connectivity guidance"
+    }
+  },
+  "performanceMetrics": {
+    "targets": {
+      "pageLoadTime": 2000,
+      "pdfProcessingTime": 10000,
+      "apiResponseTime": 3000,
+      "memoryUsage": "Stable during operations",
+      "cpuUsage": "Reasonable during PDF processing"
+    },
+    "testData": {
+      "smallPDF": {
+        "size": 102400,
+        "expectedProcessingTime": 2000
+      },
+      "mediumPDF": {
+        "size": 1024000,
+        "expectedProcessingTime": 5000
+      },
+      "largePDF": {
+        "size": 5120000,
+        "expectedProcessingTime": 10000
+      }
+    }
+  },
+  "browserCompatibility": {
+    "supportedBrowsers": [
+      {
+        "name": "Chrome",
+        "versions": ["Latest", "Latest-1"],
+        "testPriority": "High"
+      },
+      {
+        "name": "Firefox", 
+        "versions": ["Latest", "Latest-1"],
+        "testPriority": "High"
+      },
+      {
+        "name": "Safari",
+        "versions": ["Latest", "Latest-1"],
+        "testPriority": "Medium"
+      },
+      {
+        "name": "Edge",
+        "versions": ["Latest", "Latest-1"],
+        "testPriority": "Medium"
+      }
+    ],
+    "mobileBrowsers": [
+      {
+        "name": "Chrome Mobile",
+        "platform": "Android",
+        "testPriority": "Medium"
+      },
+      {
+        "name": "Safari Mobile",
+        "platform": "iOS", 
+        "testPriority": "Medium"
+      }
+    ]
+  },
+  "accessibilityTests": {
+    "wcagCompliance": {
+      "level": "AA",
+      "version": "2.1",
+      "requirements": [
+        "Keyboard navigation support",
+        "Screen reader compatibility", 
+        "Color contrast compliance",
+        "Focus management",
+        "ARIA labels and roles"
+      ]
+    },
+    "testCases": [
+      {
+        "name": "Keyboard Navigation",
+        "description": "Verify all interactive elements are accessible via keyboard",
+        "priority": "High"
+      },
+      {
+        "name": "Screen Reader Support",
+        "description": "Verify screen reader compatibility and proper announcements",
+        "priority": "High"
+      },
+      {
+        "name": "Color Contrast",
+        "description": "Verify sufficient color contrast ratios",
+        "priority": "Medium"
+      }
+    ]
+  },
+  "securityTests": {
+    "dataSecurity": [
+      {
+        "name": "No Local Storage",
+        "description": "Verify no sensitive data is stored locally",
+        "priority": "High"
+      },
+      {
+        "name": "Input Sanitization",
+        "description": "Verify all inputs are properly sanitized",
+        "priority": "High"
+      },
+      {
+        "name": "XSS Prevention",
+        "description": "Verify XSS vulnerabilities are prevented",
+        "priority": "High"
+      }
+    ],
+    "apiSecurity": [
+      {
+        "name": "HTTPS Enforcement",
+        "description": "Verify HTTPS is enforced in production",
+        "priority": "High"
+      },
+      {
+        "name": "Rate Limiting",
+        "description": "Verify API rate limiting is implemented",
+        "priority": "Medium"
+      }
+    ]
+  },
+  "testDataVariations": {
+    "cvContentTypes": [
+      "Standard text-based CV",
+      "CV with tables and formatting",
+      "CV with special characters",
+      "CV with Unicode characters",
+      "CV with images and text overlay",
+      "Multi-page CV",
+      "CV with embedded fonts"
+    ],
+    "jobDescriptionTypes": [
+      "Standard job description",
+      "Very detailed job description", 
+      "Job description with special characters",
+      "Job description with formatting",
+      "Job description in different languages",
+      "Job description with technical requirements"
+    ],
+    "errorScenarios": [
+      "Network connectivity issues",
+      "API server errors",
+      "Invalid file formats",
+      "Corrupted PDF files",
+      "Large file uploads",
+      "Form validation errors",
+      "Browser compatibility issues"
+    ]
+  }
+}
