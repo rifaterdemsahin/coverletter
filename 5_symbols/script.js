@@ -98,6 +98,22 @@ class CoverLetterGenerator {
         if (this.debugCopyPrompt) {
             this.debugCopyPrompt.addEventListener('click', this.copyDebugPrompt.bind(this));
         }
+
+        // Video modal controls
+        this.videoDemoBtn = document.getElementById('videoDemoBtn');
+        this.videoModal = document.getElementById('videoModal');
+        this.videoModalClose = document.getElementById('videoModalClose');
+        this.videoFrame = document.getElementById('videoFrame');
+
+        if (this.videoDemoBtn) {
+            this.videoDemoBtn.addEventListener('click', this.openVideoModal.bind(this));
+        }
+        if (this.videoModalClose) {
+            this.videoModalClose.addEventListener('click', this.closeVideoModal.bind(this));
+        }
+        if (this.videoModal) {
+            this.videoModal.addEventListener('click', this.handleModalBackdropClick.bind(this));
+        }
     }
 
     handleDragOver(e) {
@@ -1110,6 +1126,48 @@ Generate a cover letter that would help this candidate stand out for this specif
             }
         } else {
             this.showError('No debug prompt available to copy.');
+        }
+    }
+
+    // Video Modal Methods
+    openVideoModal() {
+        if (this.videoModal) {
+            this.videoModal.classList.add('show');
+            document.body.style.overflow = 'hidden'; // Prevent background scrolling
+            
+            // Add escape key listener
+            document.addEventListener('keydown', this.handleEscapeKey.bind(this));
+        }
+    }
+
+    closeVideoModal() {
+        if (this.videoModal) {
+            this.videoModal.classList.remove('show');
+            document.body.style.overflow = ''; // Restore scrolling
+            
+            // Stop video playback by resetting src
+            if (this.videoFrame) {
+                const currentSrc = this.videoFrame.src;
+                this.videoFrame.src = '';
+                setTimeout(() => {
+                    this.videoFrame.src = currentSrc;
+                }, 100);
+            }
+            
+            // Remove escape key listener
+            document.removeEventListener('keydown', this.handleEscapeKey.bind(this));
+        }
+    }
+
+    handleModalBackdropClick(e) {
+        if (e.target === this.videoModal) {
+            this.closeVideoModal();
+        }
+    }
+
+    handleEscapeKey(e) {
+        if (e.key === 'Escape' && this.videoModal.classList.contains('show')) {
+            this.closeVideoModal();
         }
     }
 }

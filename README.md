@@ -4,6 +4,8 @@ A modern, AI-powered web application that generates personalized cover letters u
 
 🌐 **Live Demo**: [https://rifaterdemsahin.github.io/coverletter/](https://rifaterdemsahin.github.io/coverletter/)
 
+🎥 **Video Demo**: [Watch the full demo on YouTube](https://youtu.be/EtpfGUGAFJw)
+
 ⚠️ **Note**: This is a free service and may experience downtime. For reliable access, consider building your own N8N workflow using the provided templates.
 
 ## ✨ Features
@@ -19,15 +21,17 @@ A modern, AI-powered web application that generates personalized cover letters u
 
 ## 🚀 Quick Start
 
-1. **Visit the Live Demo**: [https://rifaterdemsahin.github.io/coverletter/](https://rifaterdemsahin.github.io/coverletter/)
+1. **Watch the Demo**: [🎥 Full Video Tutorial](https://youtu.be/EtpfGUGAFJw)
 
-2. **Upload Your CV**: Drag and drop or click to upload your PDF resume
+2. **Visit the Live Demo**: [https://rifaterdemsahin.github.io/coverletter/](https://rifaterdemsahin.github.io/coverletter/)
 
-3. **Fill Job Details**: Enter company name, job title, job description, and your contact information
+3. **Upload Your CV**: Drag and drop or click to upload your PDF resume
 
-4. **Generate**: Click "Generate Cover Letter" and wait for AI processing
+4. **Fill Job Details**: Enter company name, job title, job description, and your contact information
 
-5. **Copy/Download**: Use the generated cover letter or download it for your application
+5. **Generate**: Click "Generate Cover Letter" and wait for AI processing
+
+6. **Copy/Download**: Use the generated cover letter or download it for your application
 
 ## 🛠️ Local Development
 
