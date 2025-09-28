@@ -721,14 +721,67 @@ body {
     border: 2px solid #4a5568;
 }
 
+.debug-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+    gap: 15px;
+}
+
 .debug-card h2 {
     font-size: 1.5rem;
     font-weight: 600;
-    margin-bottom: 20px;
     color: #f7fafc;
     display: flex;
     align-items: center;
     gap: 10px;
+    margin: 0;
+}
+
+.debug-controls {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+.debug-toggle,
+.debug-copy {
+    background: #4a5568;
+    border: 1px solid #718096;
+    color: #f7fafc;
+    padding: 8px 16px;
+    border-radius: 6px;
+    font-size: 0.85rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.debug-toggle:hover,
+.debug-copy:hover {
+    background: #667eea;
+    border-color: #667eea;
+    transform: translateY(-1px);
+}
+
+.debug-toggle:active,
+.debug-copy:active {
+    transform: translateY(0);
+}
+
+.debug-copy {
+    background: #38a169;
+    border-color: #38a169;
+}
+
+.debug-copy:hover {
+    background: #2f855a;
+    border-color: #2f855a;
 }
 
 .debug-content {
@@ -760,6 +813,27 @@ body {
     font-size: 0.85rem;
     line-height: 1.4;
     resize: vertical;
+    min-height: 120px;
+    max-height: 400px;
+    overflow-y: auto;
+    word-wrap: break-word;
+    white-space: pre-wrap;
+}
+
+/* Special styling for prompt textarea */
+.debug-item textarea#debugPrompt {
+    background: linear-gradient(135deg, #1a202c 0%, #2d3748 100%);
+    border: 2px solid #4a5568;
+    font-size: 0.8rem;
+    line-height: 1.5;
+    min-height: 200px;
+    max-height: 600px;
+    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.debug-item textarea#debugPrompt:focus {
+    border-color: #667eea;
+    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.3), 0 0 0 3px rgba(102, 126, 234, 0.2);
 }
 
 .debug-item textarea:focus {
@@ -776,6 +850,52 @@ body {
     font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
     font-size: 0.9rem;
     border: 1px solid #718096;
+}
+
+.prompt-container {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.prompt-info {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 15px;
+    flex-wrap: wrap;
+}
+
+.prompt-length,
+.prompt-status {
+    font-size: 0.8rem;
+    color: #a0aec0;
+    font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+}
+
+.prompt-status {
+    padding: 4px 8px;
+    border-radius: 4px;
+    background: #2d3748;
+    border: 1px solid #4a5568;
+}
+
+.prompt-status.success {
+    background: #38a169;
+    border-color: #38a169;
+    color: #f7fafc;
+}
+
+.prompt-status.warning {
+    background: #d69e2e;
+    border-color: #d69e2e;
+    color: #1a202c;
+}
+
+.prompt-status.error {
+    background: #e53e3e;
+    border-color: #e53e3e;
+    color: #f7fafc;
 }
 
 /* Responsive footer */

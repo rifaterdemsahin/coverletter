@@ -43,6 +43,11 @@ class CoverLetterGenerator {
         this.debugCvLength = document.getElementById('debugCvLength');
         this.debugCvSource = document.getElementById('debugCvSource');
         this.debugFormData = document.getElementById('debugFormData');
+        this.debugToggle = document.getElementById('debugToggle');
+        this.debugCopyPrompt = document.getElementById('debugCopyPrompt');
+        this.debugContent = document.getElementById('debugContent');
+        this.promptLength = document.getElementById('promptLength');
+        this.promptStatus = document.getElementById('promptStatus');
 
         // CV data cache
         this.cachedCvData = null;
@@ -85,6 +90,14 @@ class CoverLetterGenerator {
         // Result actions
         this.copyBtn.addEventListener('click', this.copyCoverLetter.bind(this));
         this.downloadBtn.addEventListener('click', this.downloadCoverLetter.bind(this));
+
+        // Debug controls
+        if (this.debugToggle) {
+            this.debugToggle.addEventListener('click', this.toggleDebugContent.bind(this));
+        }
+        if (this.debugCopyPrompt) {
+            this.debugCopyPrompt.addEventListener('click', this.copyDebugPrompt.bind(this));
+        }
     }
 
     handleDragOver(e) {
@@ -509,6 +522,11 @@ If the issue persists, try using the sample CV option or contact support.`;
                 reader.readAsText(file, 'UTF-8');
             });
         }
+
+        // Validate that this is actually a PDF file
+        if (file.type !== 'application/pdf') {
+            throw new Error('File is not a valid PDF document');
+        }
         
         // For PDF files, extract text using PDF.js
         return new Promise((resolve, reject) => {
@@ -555,6 +573,11 @@ If the issue persists, try using the sample CV option or contact support.`;
                     
                     if (fullText.trim().length === 0) {
                         throw new Error('No text content found in PDF. The PDF might be image-based or corrupted.');
+                    }
+
+                    // Validate that we extracted actual text content, not raw PDF data
+                    if (this.isRawPDFContent(fullText)) {
+                        throw new Error('PDF text extraction returned raw PDF content instead of readable text. The PDF may be corrupted or use an unsupported format.');
                     }
                     
                     console.log('✅ PDF text extraction successful');
@@ -657,10 +680,93 @@ If the issue persists, try using the sample CV option or contact support.`;
         }
     }
 
+    isRawPDFContent(text) {
+        // Check if the text contains raw PDF content indicators
+        if (!text || typeof text !== 'string') {
+            return false;
+        }
+
+        const rawPDFIndicators = [
+            /^%PDF-/,  // PDF header
+            /obj\s*<</,  // PDF object structure
+            /endobj/,   // PDF object end
+            /stream\s*/, // PDF stream
+            /endstream/, // PDF stream end
+            /xref/,     // PDF cross-reference
+            /trailer/,  // PDF trailer
+            /\/Title\s*\(/,  // PDF title object
+            /\/Producer\s*\(/, // PDF producer object
+            /\/Creator\s*\(/,  // PDF creator object
+            /\/CreationDate\s*\(/, // PDF creation date
+            /\/ModDate\s*\(/,  // PDF modification date
+            /\/Author\s*\(/,   // PDF author object
+            /\/Subject\s*\(/,  // PDF subject object
+            /\/Keywords\s*\(/, // PDF keywords object
+            /BT\s*/,    // Begin text object
+            /ET\s*/,    // End text object
+            /Tf\s*/,    // Text font
+            /Tm\s*/,    // Text matrix
+            /Tj\s*/,    // Text show
+            /TJ\s*/,    // Text show with positioning
+            /rg\s*/,    // RGB color
+            /RG\s*/,    // RGB color (stroking)
+            /gs\s*/,    // Graphics state
+            /q\s*/,     // Save graphics state
+            /Q\s*/,     // Restore graphics state
+            /cm\s*/,    // Concatenate matrix
+            /re\s*/,    // Rectangle
+            /S\s*/,     // Stroke path
+            /s\s*/,     // Close and stroke path
+            /f\s*/,     // Fill path
+            /F\s*/,     // Fill path (deprecated)
+            /B\s*/,     // Fill and stroke path
+            /b\s*/,     // Close, fill and stroke path
+            /n\s*/,     // New path
+            /h\s*/,     // Close path
+            /m\s*/,     // Move to
+            /l\s*/,     // Line to
+            /c\s*/,     // Curve to
+            /v\s*/,     // Curve to (initial control point)
+            /y\s*/,     // Curve to (final control point)
+        ];
+
+        // Count how many raw PDF indicators are present
+        let indicatorCount = 0;
+        for (const indicator of rawPDFIndicators) {
+            if (indicator.test(text)) {
+                indicatorCount++;
+            }
+        }
+
+        // If we find more than 3 raw PDF indicators, it's likely raw PDF content
+        if (indicatorCount > 3) {
+            console.warn('⚠️ Detected raw PDF content with', indicatorCount, 'indicators');
+            return true;
+        }
+
+        // Check for excessive binary-like content
+        const binaryCharCount = (text.match(/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F-\xFF]/g) || []).length;
+        const totalChars = text.length;
+        const binaryRatio = binaryCharCount / totalChars;
+
+        // If more than 20% of characters are binary-like, it's likely raw PDF content
+        if (binaryRatio > 0.2) {
+            console.warn('⚠️ Detected high binary content ratio:', (binaryRatio * 100).toFixed(1) + '%');
+            return true;
+        }
+
+        return false;
+    }
+
     sanitizeText(text) {
         // Clean and sanitize text to prevent character corruption
         if (!text || typeof text !== 'string') {
             return '';
+        }
+
+        // Check if this is raw PDF content before sanitizing
+        if (this.isRawPDFContent(text)) {
+            console.warn('⚠️ Attempting to sanitize raw PDF content - this may not work properly');
         }
         
         // Remove null bytes and other control characters that can cause issues
@@ -963,6 +1069,47 @@ Generate a cover letter that would help this candidate stand out for this specif
     updateDebugPrompt(prompt) {
         if (this.debugPrompt) {
             this.debugPrompt.value = prompt;
+            
+            // Update prompt length
+            if (this.promptLength) {
+                this.promptLength.textContent = prompt.length;
+            }
+            
+            // Update prompt status
+            if (this.promptStatus) {
+                if (this.isRawPDFContent(prompt)) {
+                    this.promptStatus.textContent = '⚠️ Raw PDF Content Detected';
+                    this.promptStatus.className = 'prompt-status error';
+                } else if (prompt.length > 0) {
+                    this.promptStatus.textContent = '✅ Valid Content';
+                    this.promptStatus.className = 'prompt-status success';
+                } else {
+                    this.promptStatus.textContent = 'Ready';
+                    this.promptStatus.className = 'prompt-status';
+                }
+            }
+        }
+    }
+
+    toggleDebugContent() {
+        if (this.debugContent && this.debugToggle) {
+            const isHidden = this.debugContent.style.display === 'none';
+            this.debugContent.style.display = isHidden ? 'block' : 'none';
+            this.debugToggle.textContent = isHidden ? 'Hide Details' : 'Show Details';
+        }
+    }
+
+    async copyDebugPrompt() {
+        if (this.debugPrompt && this.debugPrompt.value) {
+            try {
+                await navigator.clipboard.writeText(this.debugPrompt.value);
+                this.showSuccess('Debug prompt copied to clipboard!');
+            } catch (error) {
+                console.error('Failed to copy debug prompt:', error);
+                this.showError('Failed to copy debug prompt to clipboard.');
+            }
+        } else {
+            this.showError('No debug prompt available to copy.');
         }
     }
 }

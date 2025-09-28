@@ -219,22 +219,34 @@ info@pexabo.com
         <!-- Debug Section -->
         <div class="debug-section" id="debugSection" style="display: none;">
             <div class="debug-card">
-                <h2>🐛 Debug Information</h2>
-                <div class="debug-content">
+                <div class="debug-header">
+                    <h2>🐛 Debug Information</h2>
+                    <div class="debug-controls">
+                        <button class="debug-toggle" id="debugToggle">Hide Details</button>
+                        <button class="debug-copy" id="debugCopyPrompt">Copy Prompt</button>
+                    </div>
+                </div>
+                <div class="debug-content" id="debugContent">
                     <div class="debug-item">
-                        <label>Current Prompt:</label>
-                        <textarea id="debugPrompt" readonly rows="10" placeholder="Prompt will appear here after generation..."></textarea>
+                        <label>📝 Current Prompt:</label>
+                        <div class="prompt-container">
+                            <textarea id="debugPrompt" readonly placeholder="Prompt will appear here after generation..."></textarea>
+                            <div class="prompt-info">
+                                <span class="prompt-length">Length: <span id="promptLength">0</span> characters</span>
+                                <span class="prompt-status" id="promptStatus">Ready</span>
+                            </div>
+                        </div>
                     </div>
                     <div class="debug-item">
-                        <label>CV Content Length:</label>
+                        <label>📄 CV Content Length:</label>
                         <span id="debugCvLength">0 characters</span>
                     </div>
                     <div class="debug-item">
-                        <label>Selected CV Source:</label>
+                        <label>🎯 Selected CV Source:</label>
                         <span id="debugCvSource">None selected</span>
                     </div>
                     <div class="debug-item">
-                        <label>Form Data:</label>
+                        <label>📋 Form Data:</label>
                         <textarea id="debugFormData" readonly rows="5" placeholder="Form data will appear here..."></textarea>
                     </div>
                 </div>
