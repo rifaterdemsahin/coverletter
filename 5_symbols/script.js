@@ -516,6 +516,23 @@ TECHNICAL DETAILS:
 - The system has fallback methods that should work
 
 💡 TIP: If the issue persists, try using the sample CV option or contact support.`;
+                } else if (error.message.includes('raw PDF content instead of readable text')) {
+                    troubleshootingSteps = `🔍 PDF TEXT EXTRACTION ISSUE:
+The PDF was processed but the extracted text appears to be in a format that the system cannot read properly.
+
+SOLUTIONS:
+1. Try uploading a different PDF file (preferably one created with a different tool)
+2. Ensure the PDF contains selectable text (not just images or scanned content)
+3. Try converting the PDF to a different format first (e.g., save as Word, then export as PDF)
+4. Use the "Load Erdem Sahin CV (Sample)" option to test the system
+5. Check if the PDF is password-protected or has special formatting
+
+TECHNICAL DETAILS:
+- The PDF was successfully processed by PDF.js
+- Text was extracted but appears to be in an unreadable format
+- This often happens with PDFs created by certain tools or with special formatting
+
+💡 TIP: Try the sample CV option to verify the system is working, then try a different PDF file.`;
                 } else {
                     troubleshootingSteps = `🔍 PDF PROCESSING TROUBLESHOOTING:
 1. Ensure the PDF is not password-protected
@@ -636,6 +653,20 @@ If the issue persists, try using the sample CV option or contact support.`;
 
                     // Validate that we extracted actual text content, not raw PDF data
                     if (this.isRawPDFContent(fullText)) {
+                        console.warn('⚠️ PDF content validation failed, but attempting to proceed...');
+                        console.log('📄 Extracted text preview:', fullText.substring(0, 500));
+                        
+                        // If we have some readable content, try to clean it up
+                        if (fullText.length > 50) {
+                            console.log('🔄 Attempting to clean up extracted text...');
+                            const cleanedText = this.cleanExtractedText(fullText);
+                            if (cleanedText.length > 50) {
+                                console.log('✅ Text cleaning successful, proceeding with cleaned content');
+                                resolve(cleanedText);
+                                return;
+                            }
+                        }
+                        
                         throw new Error('PDF text extraction returned raw PDF content instead of readable text. The PDF may be corrupted or use an unsupported format.');
                     }
                     
@@ -835,8 +866,9 @@ If the issue persists, try using the sample CV option or contact support.`;
             return false;
         }
 
+        // More specific raw PDF indicators that are less likely to appear in normal text
         const rawPDFIndicators = [
-            /^%PDF-/,  // PDF header
+            /^%PDF-/,  // PDF header at start
             /obj\s*<</,  // PDF object structure
             /endobj/,   // PDF object end
             /stream\s*/, // PDF stream
@@ -851,32 +883,6 @@ If the issue persists, try using the sample CV option or contact support.`;
             /\/Author\s*\(/,   // PDF author object
             /\/Subject\s*\(/,  // PDF subject object
             /\/Keywords\s*\(/, // PDF keywords object
-            /BT\s*/,    // Begin text object
-            /ET\s*/,    // End text object
-            /Tf\s*/,    // Text font
-            /Tm\s*/,    // Text matrix
-            /Tj\s*/,    // Text show
-            /TJ\s*/,    // Text show with positioning
-            /rg\s*/,    // RGB color
-            /RG\s*/,    // RGB color (stroking)
-            /gs\s*/,    // Graphics state
-            /q\s*/,     // Save graphics state
-            /Q\s*/,     // Restore graphics state
-            /cm\s*/,    // Concatenate matrix
-            /re\s*/,    // Rectangle
-            /S\s*/,     // Stroke path
-            /s\s*/,     // Close and stroke path
-            /f\s*/,     // Fill path
-            /F\s*/,     // Fill path (deprecated)
-            /B\s*/,     // Fill and stroke path
-            /b\s*/,     // Close, fill and stroke path
-            /n\s*/,     // New path
-            /h\s*/,     // Close path
-            /m\s*/,     // Move to
-            /l\s*/,     // Line to
-            /c\s*/,     // Curve to
-            /v\s*/,     // Curve to (initial control point)
-            /y\s*/,     // Curve to (final control point)
         ];
 
         // Count how many raw PDF indicators are present
@@ -887,24 +893,64 @@ If the issue persists, try using the sample CV option or contact support.`;
             }
         }
 
-        // If we find more than 3 raw PDF indicators, it's likely raw PDF content
-        if (indicatorCount > 3) {
-            console.warn('⚠️ Detected raw PDF content with', indicatorCount, 'indicators');
+        // Only flag as raw PDF if we find multiple strong indicators
+        if (indicatorCount > 2) {
+            console.warn('⚠️ Detected raw PDF content with', indicatorCount, 'strong indicators');
             return true;
         }
 
-        // Check for excessive binary-like content
+        // Check for excessive binary-like content (more lenient threshold)
         const binaryCharCount = (text.match(/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F-\xFF]/g) || []).length;
         const totalChars = text.length;
         const binaryRatio = binaryCharCount / totalChars;
 
-        // If more than 20% of characters are binary-like, it's likely raw PDF content
-        if (binaryRatio > 0.2) {
+        // If more than 30% of characters are binary-like, it's likely raw PDF content
+        if (binaryRatio > 0.3) {
             console.warn('⚠️ Detected high binary content ratio:', (binaryRatio * 100).toFixed(1) + '%');
             return true;
         }
 
+        // Check if the text looks like readable content (has words, sentences)
+        const wordCount = (text.match(/\b\w+\b/g) || []).length;
+        const sentenceCount = (text.match(/[.!?]+/g) || []).length;
+        
+        // If we have a reasonable amount of words and sentences, it's likely readable text
+        if (wordCount > 10 && sentenceCount > 1) {
+            console.log('✅ Text appears to be readable content:', wordCount, 'words,', sentenceCount, 'sentences');
+            return false;
+        }
+
         return false;
+    }
+
+    cleanExtractedText(text) {
+        // Clean up extracted PDF text to make it more readable
+        console.log('🧹 Cleaning extracted PDF text...');
+        
+        // Remove common PDF artifacts
+        let cleaned = text
+            .replace(/\s+/g, ' ')  // Replace multiple spaces with single space
+            .replace(/\n\s*\n/g, '\n')  // Remove empty lines
+            .replace(/[^\w\s.,!?;:()\-'"]/g, ' ')  // Remove special characters but keep punctuation
+            .replace(/\s+/g, ' ')  // Clean up spaces again
+            .trim();
+        
+        // Try to identify and extract meaningful content
+        const lines = cleaned.split('\n');
+        const meaningfulLines = lines.filter(line => {
+            const trimmed = line.trim();
+            return trimmed.length > 3 && 
+                   !trimmed.match(/^[0-9\s\-_]+$/) &&  // Not just numbers/dashes
+                   !trimmed.match(/^[A-Z\s]+$/) &&    // Not just uppercase (likely headers)
+                   trimmed.includes(' ') &&            // Has spaces (likely words)
+                   trimmed.length > 10;                // Reasonable length
+        });
+        
+        const result = meaningfulLines.join('\n').trim();
+        console.log('📄 Cleaned text length:', result.length, 'characters');
+        console.log('📄 Cleaned text preview:', result.substring(0, 200) + '...');
+        
+        return result;
     }
 
     sanitizeText(text) {
