@@ -169,6 +169,88 @@ TECHNICAL DETAILS:
 - Use a different browser if the issue persists
 - Try the sample CV option to test the system
 
+### Error: "PDF extraction failed: this.isRawPDFContent is not a function"
+**Cause**: JavaScript method binding issue - the `isRawPDFContent` method is not available in the current context
+**Solution**:
+```javascript
+// Enhanced method availability check before calling
+console.log('🔍 Validating extracted PDF content...');
+console.log('📊 Content validation details:', {
+    textLength: fullText.length,
+    hasText: fullText.trim().length > 0,
+    firstChars: fullText.substring(0, 100),
+    lastChars: fullText.substring(Math.max(0, fullText.length - 100))
+});
+
+// Check if isRawPDFContent method exists and is callable
+if (typeof this.isRawPDFContent !== 'function') {
+    console.error('❌ isRawPDFContent method not available, skipping validation');
+    console.log('📄 Proceeding with extracted text without validation');
+    resolve(fullText);
+    return;
+}
+
+const isRawContent = this.isRawPDFContent(fullText);
+console.log('🔍 Raw content check result:', isRawContent);
+```
+
+**Enhanced Error Handling**:
+```javascript
+// Comprehensive error logging with context information
+catch (error) {
+    console.error('❌ Error in generateCoverLetter:', error);
+    console.error('Error details:', {
+        name: error.name,
+        message: error.message,
+        type: typeof error,
+        constructor: error.constructor.name,
+        hasStack: !!error.stack
+    });
+    
+    // Enhanced debug information
+    console.log('🔍 Debug context information:');
+    console.log('- PDF file:', this.cvFile ? this.cvFile.name : 'No file');
+    console.log('- Cached CV data:', this.cachedCvData ? 'Available' : 'Not available');
+    console.log('- Form data:', Object.fromEntries(new FormData(this.jobSpecsForm).entries()));
+    console.log('- Available methods:', Object.getOwnPropertyNames(this).filter(name => typeof this[name] === 'function'));
+}
+```
+
+**Specific Error Handler**:
+```javascript
+// Dedicated handler for "is not a function" errors
+else if (error.message.includes('is not a function')) {
+    troubleshootingSteps = `🔍 JAVASCRIPT METHOD ERROR DETECTED:
+This error indicates a JavaScript method binding issue. The system has encountered a method that is not available.
+
+SOLUTIONS:
+1. Refresh the page and try again (JavaScript context may be corrupted)
+2. Clear your browser cache and cookies
+3. Try using a different browser (Chrome, Firefox, Safari)
+4. Disable browser extensions temporarily
+5. Use the "Load Erdem Sahin CV (Sample)" option to test the system
+
+TECHNICAL DETAILS:
+- Error: JavaScript method not available in current context
+- This usually happens when the page context is corrupted
+- The system has fallback methods that should work
+
+💡 TIP: If the issue persists, try using the sample CV option or contact support.`;
+}
+```
+
+**Prevention**: 
+- Method availability checks before calling
+- Enhanced error logging and context information
+- Fallback behavior when methods are unavailable
+- Comprehensive debug information collection
+
+**User Action**: 
+- Refresh the page and try again
+- Clear browser cache and cookies
+- Try a different browser if the issue persists
+- Use the sample CV option to test the system
+
 ## Form Validation Errors
 
 ### Error: "Please fill in all required fields"
