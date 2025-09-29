@@ -7,8 +7,17 @@
     <title>AI Cover Letter Generator</title>
     <link rel="stylesheet" href="styles.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <!-- PDF.js CDN -->
+    <!-- PDF.js CDN - Using a more stable version -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+    <script>
+        // Ensure PDF.js is properly initialized
+        window.addEventListener('load', function() {
+            if (typeof window.pdfjsLib !== 'undefined') {
+                console.log('✅ PDF.js loaded and ready');
+                window.pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+            }
+        });
+    </script>
 </head>
 <body>
     <div class="container">

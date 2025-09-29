@@ -46,6 +46,129 @@ try {
 **Prevention**: Validate file integrity before processing
 **User Action**: Try a different PDF file
 
+### Error: "PDF extraction failed: this.jsIsw.pdf.Content is not a function"
+**Cause**: PDF.js library not properly loaded or API method unavailable
+**Solution**:
+```javascript
+// Enhanced PDF.js initialization with proper error handling
+async waitForPDFJS() {
+    return new Promise((resolve, reject) => {
+        const checkPDFJS = () => {
+            if (typeof window.pdfjsLib !== 'undefined' && 
+                typeof window.pdfjsLib.getDocument === 'function') {
+                console.log('✅ PDF.js library is ready');
+                resolve();
+            } else {
+                console.log('⏳ Waiting for PDF.js library to load...');
+                setTimeout(checkPDFJS, 100);
+            }
+        };
+        
+        // Set timeout to prevent infinite waiting
+        setTimeout(() => {
+            reject(new Error('PDF.js library failed to load within timeout period'));
+        }, 10000);
+        
+        checkPDFJS();
+    });
+}
+
+// Alternative PDF extraction method
+async alternativePDFExtraction(arrayBuffer) {
+    console.log('🔄 Using alternative PDF extraction method...');
+    
+    try {
+        // Try using a different PDF.js configuration
+        const loadingTask = window.pdfjsLib.getDocument({
+            data: arrayBuffer,
+            verbosity: 0,
+            disableAutoFetch: true,
+            disableStream: true,
+            disableRange: true
+        });
+        
+        const pdf = await loadingTask.promise;
+        let fullText = '';
+        
+        // Extract text from all pages with different approach
+        for (let pageNum = 1; pageNum <= pdf.numPages; pageNum++) {
+            const page = await pdf.getPage(pageNum);
+            const textContent = await page.getTextContent();
+            
+            const pageText = textContent.items
+                .map(item => {
+                    if (item.str && typeof item.str === 'string') {
+                        return item.str;
+                    }
+                    return '';
+                })
+                .filter(text => text.trim().length > 0)
+                .join(' ');
+                
+            fullText += pageText + '\n';
+        }
+        
+        if (fullText.trim().length > 0) {
+            console.log('✅ Alternative PDF extraction successful');
+            return fullText.trim();
+        }
+        
+        throw new Error('No text content found with alternative method');
+    } catch (error) {
+        console.error('❌ Alternative PDF extraction failed:', error);
+        throw error;
+    }
+}
+
+// Enhanced error handling for specific PDF.js errors
+catch (error) {
+    // Handle specific PDF.js errors
+    if (error.message.includes('Content is not a function') || 
+        error.message.includes('this.jsIsw.pdf.Content')) {
+        console.log('🔄 Detected PDF.js API error, attempting alternative approach...');
+        try {
+            // Try a different PDF.js approach
+            const alternativeText = await this.alternativePDFExtraction(arrayBuffer);
+            if (alternativeText && alternativeText.trim().length > 0) {
+                console.log('✅ Alternative PDF extraction successful');
+                resolve(alternativeText);
+                return;
+            }
+        } catch (altError) {
+            console.error('❌ Alternative PDF extraction failed:', altError);
+        }
+    }
+}
+```
+
+**Troubleshooting Steps**:
+```
+🔍 PDF.JS API ERROR DETECTED:
+This error indicates a PDF.js library issue. The system has attempted multiple extraction methods.
+
+SOLUTIONS:
+1. Refresh the page and try again (PDF.js may not have loaded properly)
+2. Try using a different browser (Chrome, Firefox, Safari)
+3. Clear your browser cache and cookies
+4. Try uploading a different PDF file
+5. Use the "Load Erdem Sahin CV (Sample)" option to test the system
+
+TECHNICAL DETAILS:
+- Error: PDF.js API method not available
+- This usually happens when PDF.js doesn't load completely
+- The system has fallback methods that should work
+```
+
+**Prevention**: 
+- Proper PDF.js library initialization
+- Multiple extraction methods as fallbacks
+- Enhanced error detection and recovery
+
+**User Action**: 
+- Refresh the page and try again
+- Use a different browser if the issue persists
+- Try the sample CV option to test the system
+
 ## Form Validation Errors
 
 ### Error: "Please fill in all required fields"
