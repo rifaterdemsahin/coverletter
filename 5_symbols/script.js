@@ -484,6 +484,20 @@ Website: hello.rifaterdemsahin.com
         } catch (error) {
             console.error('❌ Error in generateCoverLetter:', error);
             console.error('Error stack:', error.stack);
+            console.error('Error details:', {
+                name: error.name,
+                message: error.message,
+                type: typeof error,
+                constructor: error.constructor.name,
+                hasStack: !!error.stack
+            });
+            
+            // Enhanced debug information
+            console.log('🔍 Debug context information:');
+            console.log('- PDF file:', this.cvFile ? this.cvFile.name : 'No file');
+            console.log('- Cached CV data:', this.cachedCvData ? 'Available' : 'Not available');
+            console.log('- Form data:', Object.fromEntries(new FormData(this.jobSpecsForm).entries()));
+            console.log('- Available methods:', Object.getOwnPropertyNames(this).filter(name => typeof this[name] === 'function'));
             
             let errorMessage = 'Failed to generate cover letter. ';
             let detailedError = '';
@@ -513,6 +527,23 @@ SOLUTIONS:
 TECHNICAL DETAILS:
 - Error: PDF.js API method not available
 - This usually happens when PDF.js doesn't load completely
+- The system has fallback methods that should work
+
+💡 TIP: If the issue persists, try using the sample CV option or contact support.`;
+                } else if (error.message.includes('is not a function')) {
+                    troubleshootingSteps = `🔍 JAVASCRIPT METHOD ERROR DETECTED:
+This error indicates a JavaScript method binding issue. The system has encountered a method that is not available.
+
+SOLUTIONS:
+1. Refresh the page and try again (JavaScript context may be corrupted)
+2. Clear your browser cache and cookies
+3. Try using a different browser (Chrome, Firefox, Safari)
+4. Disable browser extensions temporarily
+5. Use the "Load Erdem Sahin CV (Sample)" option to test the system
+
+TECHNICAL DETAILS:
+- Error: JavaScript method not available in current context
+- This usually happens when the page context is corrupted
 - The system has fallback methods that should work
 
 💡 TIP: If the issue persists, try using the sample CV option or contact support.`;
@@ -652,18 +683,41 @@ If the issue persists, try using the sample CV option or contact support.`;
                     }
 
                     // Validate that we extracted actual text content, not raw PDF data
-                    if (this.isRawPDFContent(fullText)) {
+                    console.log('🔍 Validating extracted PDF content...');
+                    console.log('📊 Content validation details:', {
+                        textLength: fullText.length,
+                        hasText: fullText.trim().length > 0,
+                        firstChars: fullText.substring(0, 100),
+                        lastChars: fullText.substring(Math.max(0, fullText.length - 100))
+                    });
+                    
+                    // Check if isRawPDFContent method exists and is callable
+                    if (typeof this.isRawPDFContent !== 'function') {
+                        console.error('❌ isRawPDFContent method not available, skipping validation');
+                        console.log('📄 Proceeding with extracted text without validation');
+                        resolve(fullText);
+                        return;
+                    }
+                    
+                    const isRawContent = this.isRawPDFContent(fullText);
+                    console.log('🔍 Raw content check result:', isRawContent);
+                    
+                    if (isRawContent) {
                         console.warn('⚠️ PDF content validation failed, but attempting to proceed...');
                         console.log('📄 Extracted text preview:', fullText.substring(0, 500));
                         
                         // If we have some readable content, try to clean it up
                         if (fullText.length > 50) {
                             console.log('🔄 Attempting to clean up extracted text...');
-                            const cleanedText = this.cleanExtractedText(fullText);
-                            if (cleanedText.length > 50) {
-                                console.log('✅ Text cleaning successful, proceeding with cleaned content');
-                                resolve(cleanedText);
-                                return;
+                            try {
+                                const cleanedText = this.cleanExtractedText(fullText);
+                                if (cleanedText && cleanedText.length > 50) {
+                                    console.log('✅ Text cleaning successful, proceeding with cleaned content');
+                                    resolve(cleanedText);
+                                    return;
+                                }
+                            } catch (cleanError) {
+                                console.error('❌ Text cleaning failed:', cleanError);
                             }
                         }
                         
@@ -1254,6 +1308,16 @@ Generate a cover letter that would help this candidate stand out for this specif
             const formObject = Object.fromEntries(formData.entries());
             this.debugFormData.value = JSON.stringify(formObject, null, 2);
         }
+        
+        // Enhanced debug information
+        console.log('🔍 Debug Info Update:', {
+            cvFile: this.cvFile ? this.cvFile.name : 'None',
+            cachedCvData: this.cachedCvData ? 'Available' : 'Not available',
+            cvSource: cvSource,
+            formData: this.jobSpecsForm ? 'Available' : 'Not available',
+            availableMethods: Object.getOwnPropertyNames(this).filter(name => typeof this[name] === 'function'),
+            pdfjsLib: typeof window.pdfjsLib !== 'undefined' ? 'Available' : 'Not available'
+        });
         
         // Show debug section if we have any data
         if (this.cvFile || this.cachedCvData) {
